@@ -2,14 +2,26 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { router as authRoutes } from "./routes/authRoutes.js";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import { dbConnect } from "./utiles/db.js"; // ES module style, .js extension
+import { dbConnect } from "./utiles/db.js";
 import http from "http";
 import { Server } from "socket.io";
+
+// Routes
+import homeRoutes from "./routes/home/homeRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import orderRoutes from "./routes/order/orderRoutes.js";
+import cardRoutes from "./routes/home/cardRoutes.js";
+import categoryRoutes from "./routes/dashboard/categoryRoutes.js";
+import productRoutes from "./routes/dashboard/productRoutes.js";
+import sellerRoutes from "./routes/dashboard/sellerRoutes.js";
+import customerAuthRoutes from "./routes/home/customerAuthRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import dashboardRoutes from "./routes/dashboard/dashboardRoutes.js";
 
 // Initialize app and server
 const app = express();
@@ -114,19 +126,7 @@ io.on('connection', (soc) => {
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// Routes (ES module style)
-import homeRoutes from "./routes/home/homeRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import orderRoutes from "./routes/order/orderRoutes.js";
-import cardRoutes from "./routes/home/cardRoutes.js";
-import categoryRoutes from "./routes/dashboard/categoryRoutes.js";
-import productRoutes from "./routes/dashboard/productRoutes.js";
-import sellerRoutes from "./routes/dashboard/sellerRoutes.js";
-import customerAuthRoutes from "./routes/home/customerAuthRoutes.js";
-import chatRoutes from "./routes/chatRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
-import dashboardRoutes from "./routes/dashboard/dashboardRoutes.js";
-
+// Routes
 app.use('/api/home', homeRoutes);
 app.use('/api', authRoutes);
 app.use('/api', orderRoutes);
