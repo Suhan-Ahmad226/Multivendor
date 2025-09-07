@@ -2,6 +2,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { router as authRoutes } from "./routes/authRoutes.js";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
