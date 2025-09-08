@@ -1,38 +1,37 @@
 // Load environment variables
-import dotenv from "dotenv";
-dotenv.config();
+require("dotenv").config();
 
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import cookieParser from "cookie-parser";
-import { dbConnect } from "./utiles/db.js";
-import http from "http";
-import { Server } from "socket.io";
-
-// Routes (named import because routes export { router })
-import { router as homeRoutes } from "./routes/home/homeRoutes.js";
-import { router as authRoutes } from "./routes/authRoutes.js";
-import { router as orderRoutes } from "./routes/order/orderRoutes.js";
-import { router as cardRoutes } from "./routes/home/cardRoutes.js";
-import { router as categoryRoutes } from "./routes/dashboard/categoryRoutes.js";
-import { router as productRoutes } from "./routes/dashboard/productRoutes.js";
-import { router as sellerRoutes } from "./routes/dashboard/sellerRoutes.js";
-import { router as customerAuthRoutes } from "./routes/home/customerAuthRoutes.js";
-import { router as chatRoutes } from "./routes/chatRoutes.js";
-import { router as paymentRoutes } from "./routes/paymentRoutes.js";
-import { router as dashboardRoutes } from "./routes/dashboard/dashboardRoutes.js";
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const { dbConnect } = require("./utiles/db");
+const http = require("http");
+const { Server } = require("socket.io");
 
 // Initialize app and server
 const app = express();
 const server = http.createServer(app);
+
+// Routes (CommonJS)
+const homeRoutes = require("./routes/home/homeRoutes");
+const authRoutes = require("./routes/authRoutes");
+const orderRoutes = require("./routes/order/orderRoutes");
+const cardRoutes = require("./routes/home/cardRoutes");
+const categoryRoutes = require("./routes/dashboard/categoryRoutes");
+const productRoutes = require("./routes/dashboard/productRoutes");
+const sellerRoutes = require("./routes/dashboard/sellerRoutes");
+const customerAuthRoutes = require("./routes/home/customerAuthRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const dashboardRoutes = require("./routes/dashboard/dashboardRoutes");
 
 // Allowed origins
 const allowedOrigins = process.env.MODE === "pro"
   ? [process.env.CLIENT_CUSTOMER_PRODUCTION_URL, process.env.CLIENT_ADMIN_PRODUCTION_URL]
   : ["http://localhost:3000", "http://localhost:3001"];
 
-// CORS middleware
+// Middlewares
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -42,6 +41,25 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(bodyParser.json());
+app.use(cookieParser());
+
+// Routes
+app.use("/api/home", homeRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api", orderRoutes);
+app.use("/api", cardRoutes);
+app.use("/api", categoryRoutes);
+app.use("/api", productRoutes);
+app.use("/api", sellerRoutes);
+app.use("/api", customerAuthRoutes);
+app.use("/api", chatRoutes);
+app.use("/api", paymentRoutes);
+app.use("/api", dashboardRoutes);
+
+// Test route
+app.get("/", (req, res) => res.send("Hello Server"));
 
 // Socket.IO
 const io = new Server(server, {
@@ -125,26 +143,6 @@ io.on("connection", (soc) => {
     io.emit("activeSeller", allSeller);
   });
 });
-
-// Middlewares
-app.use(bodyParser.json());
-app.use(cookieParser());
-
-// Routes
-app.use("/api/home", homeRoutes);
-app.use("/api", authRoutes);
-app.use("/api", orderRoutes);
-app.use("/api", cardRoutes);
-app.use("/api", categoryRoutes);
-app.use("/api", productRoutes);
-app.use("/api", sellerRoutes);
-app.use("/api", customerAuthRoutes);
-app.use("/api", chatRoutes);
-app.use("/api", paymentRoutes);
-app.use("/api", dashboardRoutes);
-
-// Test route
-app.get("/", (req, res) => res.send("Hello Server"));
 
 // Connect DB & start server
 dbConnect();
