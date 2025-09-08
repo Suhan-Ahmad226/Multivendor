@@ -16,4 +16,3 @@ router.get('/chat/get-seller-messages',authMiddleware,ChatController.get_seller_
  
  
 module.exports = router 
-export default router;
