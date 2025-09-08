@@ -12,3 +12,4 @@ router.get('/home/product/get-wishlist-products/:userId',cardController.get_wish
 router.delete('/home/product/remove-wishlist-product/:wishlistId',cardController.remove_wishlist) 
 
 module.exports = router 
+export default router;
