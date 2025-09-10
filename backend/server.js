@@ -16,7 +16,7 @@ const allowedOrigins = process.env.mode === 'pro'
       process.env.client_customer_production_url,
       process.env.client_admin_production_url
     ]
-  : ['http://localhost:3000', 'http://localhost:3001'];
+  : ['https://multivendor-puce.vercel.app', 'https://multivendor-hiil.vercel.app'];
 
 const corsOptions = {
   origin: function (origin, callback) {
