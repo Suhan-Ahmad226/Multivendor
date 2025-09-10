@@ -1,5 +1,5 @@
 import axios from "axios";
-const local = 'http://localhost:5000'
+//const local = 'http://localhost:5000'
 const production = 'https://multivendor-vp55.onrender.com'
 
 let api_url = ''
