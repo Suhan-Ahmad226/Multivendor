@@ -30,20 +30,18 @@ const Footer = () => {
         {/* Company Info */}
         <div className="col-span-3 sm:col-span-6 xs:col-span-12">
           <img
-            src="https://i.ibb.co/7yZVb4j/nittonjoni-logo.png"
-            alt="Nittonjoni Logo"
+            src="/images/logo.png"
+            alt="logo"
             className="w-[180px] h-[60px] mb-3"
           />
           <p className="mb-3 leading-6">
             Nittonjoni is your trusted online shopping destination. We deliver
-            genuine products at affordable prices with a 30-day replacement
-            guarantee.
+            genuine products at affordable prices.
           </p>
           <ul className="space-y-1">
             <li>📍 New Market, Dhaka-1205</li>
             <li>📞 +8801518947696, +8801401424534</li>
             <li>📧 nittyonjoni@gmail.com</li>
-            <li>🕒 Sat - Thu : 10AM - 10PM</li>
           </ul>
         </div>
 
@@ -188,65 +186,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Payment */}
-        <div className="col-span-5 sm:col-span-6">
-          <h2 className="font-bold text-lg mb-3">We Accept</h2>
-          <div className="flex gap-3 flex-wrap items-center">
-            <img
-              src="https://i.ibb.co/kc9v4L5/cash-on-delivery.png"
-              alt="Cash on Delivery"
-              className="w-14"
-            />
-            <img
-              src="https://download.logo.wine/logo/Bkash/Bkash-Logo.wine.png"
-              alt="bKash"
-              className="w-14"
-            />
-            <img
-              src="https://seeklogo.com/images/N/nagad-logo-3414E3F5C2-seeklogo.com.png"
-              alt="Nagad"
-              className="w-14"
-            />
-            <img
-              src="https://i.ibb.co/4WSrTQS/rocket.png"
-              alt="Rocket"
-              className="w-14"
-            />
-            <img
-              src="https://seeklogo.com/images/S/sslcommerz-logo-331C1E65C5-seeklogo.com.png"
-              alt="SSLCommerz"
-              className="w-20"
-            />
-            <img
-              src="https://i.ibb.co/jVp1yHd/dbbl.png"
-              alt="DBBL"
-              className="w-16"
-            />
-            <img
-              src="https://i.ibb.co/Y3TgM5d/community-police.png"
-              alt="Community Police"
-              className="w-16"
-            />
-          </div>
-        </div>
-
-        {/* App Download */}
-        <div className="col-span-4 sm:col-span-12">
-          <h2 className="font-bold text-lg mb-3">Download Our App</h2>
-          <div className="flex gap-3">
-            <img
-              src="https://i.ibb.co/fn3S9xM/playstore.png"
-              alt="Google Play"
-              className="w-32 cursor-pointer hover:opacity-80"
-            />
-            <img
-              src="https://i.ibb.co/JQ3dC9t/appstore.png"
-              alt="App Store"
-              className="w-32 cursor-pointer hover:opacity-80"
-            />
-          </div>
-        </div>
-      </div>
 
       {/* Bottom */}
       <div className="w-full text-center py-5 text-sm text-slate-500">
