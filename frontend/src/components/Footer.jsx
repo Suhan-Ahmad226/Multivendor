@@ -1,11 +1,6 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaLinkedin,
-  FaYoutube,
-} from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
 import { FaTwitter, FaHeart, FaCartShopping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 
@@ -24,11 +19,11 @@ const Footer = () => {
     }`;
 
   return (
-    <footer className="bg-[#f3f6fa] text-slate-600 text-sm">
+    <footer className="bg-[#f3f6fa] text-slate-600 text-sm relative">
       {/* Top Section */}
-      <div className="w-[85%] mx-auto py-14 border-b grid grid-cols-12 gap-8 sm:grid-cols-6 xs:grid-cols-1">
+      <div className="w-[85%] mx-auto py-14 border-b grid grid-cols-1 sm:grid-cols-6 lg:grid-cols-12 gap-8">
         {/* Company Info */}
-        <div className="col-span-3 sm:col-span-6 xs:col-span-12">
+        <div className="lg:col-span-3 sm:col-span-6 col-span-1">
           <img
             src="/images/logo.png"
             alt="logo"
@@ -36,7 +31,7 @@ const Footer = () => {
           />
           <p className="mb-3 leading-6">
             Nittonjoni is your trusted online shopping destination. We deliver
-            genuine products at affordable prices.
+            genuine products at affordable prices with a 30-day replacement guarantee.
           </p>
           <ul className="space-y-1">
             <li>📍 New Market, Dhaka-1205</li>
@@ -46,7 +41,7 @@ const Footer = () => {
         </div>
 
         {/* Useful Links */}
-        <div className="col-span-2 sm:col-span-3 xs:col-span-6">
+        <div className="lg:col-span-2 sm:col-span-3 col-span-1">
           <h2 className="font-bold text-lg mb-3">Useful Links</h2>
           <ul className="space-y-2 font-semibold">
             <li>
@@ -60,10 +55,7 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link
-                to="/privacy-policy"
-                className={linkClass("/privacy-policy")}
-              >
+              <Link to="/privacy-policy" className={linkClass("/privacy-policy")}>
                 Privacy Policy
               </Link>
             </li>
@@ -81,7 +73,7 @@ const Footer = () => {
         </div>
 
         {/* Customer Support */}
-        <div className="col-span-2 sm:col-span-3 xs:col-span-6">
+        <div className="lg:col-span-2 sm:col-span-3 col-span-1">
           <h2 className="font-bold text-lg mb-3">Customer Support</h2>
           <ul className="space-y-2 font-semibold">
             <li>
@@ -113,7 +105,7 @@ const Footer = () => {
         </div>
 
         {/* My Account */}
-        <div className="col-span-2 sm:col-span-6 xs:col-span-6">
+        <div className="lg:col-span-2 sm:col-span-6 col-span-1">
           <h2 className="font-bold text-lg mb-3">My Account</h2>
           <ul className="space-y-2 font-semibold">
             <li>
@@ -122,18 +114,12 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link
-                to="/dashboard/my-orders"
-                className={linkClass("/dashboard/my-orders")}
-              >
+              <Link to="/dashboard/my-orders" className={linkClass("/dashboard/my-orders")}>
                 My Orders
               </Link>
             </li>
             <li>
-              <Link
-                to="/dashboard/my-wishlist"
-                className={linkClass("/dashboard/my-wishlist")}
-              >
+              <Link to="/dashboard/my-wishlist" className={linkClass("/dashboard/my-wishlist")}>
                 Wishlist
               </Link>
             </li>
@@ -146,28 +132,27 @@ const Footer = () => {
         </div>
 
         {/* Newsletter */}
-        <div className="col-span-3 sm:col-span-12">
+        <div className="lg:col-span-3 sm:col-span-12 col-span-1">
           <h2 className="font-bold text-lg mb-3">Join Our Newsletter</h2>
           <p className="mb-3">Subscribe to get updates on offers & new arrivals.</p>
-          <div className="flex">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="email"
               placeholder="Enter your email"
-              className="px-3 py-2 border w-full rounded-l-md outline-none"
+              className="px-3 py-2 border w-full rounded-l-md outline-none flex-1"
             />
-            <button className="bg-[#059473] hover:bg-[#04785E] text-white px-5 rounded-r-md font-semibold">
+            <button className="bg-[#059473] hover:bg-[#04785E] text-white px-5 rounded-md sm:rounded-l-none font-semibold">
               Subscribe
             </button>
           </div>
         </div>
       </div>
 
-      {/* Social + Payment + Apps */}
-      <div className="w-[85%] mx-auto py-10 border-b grid grid-cols-12 gap-8 sm:grid-cols-6 xs:grid-cols-1">
-        {/* Social */}
-        <div className="col-span-3 sm:col-span-6">
+      {/* Social Section */}
+      <div className="w-[85%] mx-auto py-10 border-b grid grid-cols-1 sm:grid-cols-6 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-3 sm:col-span-6 col-span-1">
           <h2 className="font-bold text-lg mb-3">Follow Us</h2>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             {[
               { icon: <FaFacebookF />, link: "#" },
               { icon: <FaInstagram />, link: "#" },
@@ -185,16 +170,15 @@ const Footer = () => {
             ))}
           </div>
         </div>
-
+      </div>
 
       {/* Bottom */}
       <div className="w-full text-center py-5 text-sm text-slate-500">
-        © {new Date().getFullYear()} Nittonjoni. All Rights Reserved. | Developed
-        by Suhan
+        © {new Date().getFullYear()} Nittonjoni. All Rights Reserved. | Developed by Suhan
       </div>
 
-      {/* Floating Buttons */}
-      <div className="hidden fixed md-lg:block w-[50px] h-[150px] bottom-3 right-2 bg-white rounded-full p-2 shadow-lg">
+      {/* Floating Buttons - Visible on all screens */}
+      <div className="fixed bottom-3 right-3 w-[50px] h-[150px] bg-white rounded-full p-2 shadow-lg z-50">
         <div className="flex flex-col gap-3 justify-center items-center h-full">
           {/* Cart */}
           <div
