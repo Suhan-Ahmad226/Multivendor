@@ -187,7 +187,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
   }, []);
 
   return (
-    <header className="w-full sticky top-0 z-50">
+    <header className="w-full sticky top-0 z-50 overflow-x-hidden">
       {/* Top promo/contact bar - visible on md+ */}
       <div
         className="hidden md:flex justify-between items-center bg-gradient-to-r from-blue-50 to-emerald-50 px-6 h-10 text-sm text-slate-700 transition-colors duration-300"
