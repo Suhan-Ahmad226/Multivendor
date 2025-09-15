@@ -40,7 +40,8 @@ const Header = () => {
 
     return (
         <div className='w-full bg-white sticky top-0 z-50 shadow-md'>
-            {/* Top Bar */}
+
+            {/* ===== Desktop Top Bar ===== */}
             <div className='hidden md:flex justify-between items-center bg-[#caddff] px-6 h-10 text-sm text-slate-700'>
                 <div className='flex gap-6'>
                     <div className='flex items-center gap-1'><MdEmail /> support@gmail.com</div>
@@ -64,9 +65,15 @@ const Header = () => {
                     </div>
                     {/* User Login/Profile */}
                     {userInfo ? (
-                        <Link to='/dashboard' className='flex items-center gap-1'>
+                        <div className='relative group cursor-pointer flex items-center gap-1'>
                             <FaUser /> {userInfo.name}
-                        </Link>
+                            <ul className='absolute top-6 right-0 hidden group-hover:block bg-white border shadow p-2 rounded w-40'>
+                                <li className='p-1 hover:bg-gray-100 cursor-pointer'><Link to='/dashboard'>Dashboard</Link></li>
+                                <li className='p-1 hover:bg-gray-100 cursor-pointer'><Link to='/dashboard/my-orders'>Orders</Link></li>
+                                <li className='p-1 hover:bg-gray-100 cursor-pointer'><Link to='/dashboard/my-wishlist'>Wishlist</Link></li>
+                                <li className='p-1 hover:bg-gray-100 cursor-pointer' onClick={() => navigate('/logout')}>Logout</li>
+                            </ul>
+                        </div>
                     ) : (
                         <Link to='/login' className='flex items-center gap-1'>
                             <FaLock /> Login
@@ -75,7 +82,7 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* Main Header */}
+            {/* ===== Main Header ===== */}
             <div className='flex justify-between items-center px-6 py-4'>
                 {/* Logo */}
                 <Link to='/' className='flex items-center'>
@@ -85,7 +92,20 @@ const Header = () => {
                 {/* Navigation */}
                 <ul className='hidden md:flex gap-6 font-bold uppercase'>
                     <li><Link className={`${pathname === '/' ? 'text-[#059473]' : 'text-slate-600'}`} to='/'>Home</Link></li>
-                    <li><Link className={`${pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'}`} to='/shops'>Shop</Link></li>
+                    <li className='relative group'>
+                        <Link className={`${pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'}`} to='/shops'>Shop</Link>
+                        {/* Mega Menu */}
+                        <div className='absolute top-full left-0 hidden group-hover:block w-[800px] bg-white shadow-lg p-6 grid grid-cols-4 gap-4 z-50'>
+                            {categorys.map((c, i) => (
+                                <div key={i}>
+                                    <Link to={`/products?category=${c.name}`} className='font-bold hover:text-green-600'>{c.name}</Link>
+                                    {c.subcategories?.map((sub,i) => (
+                                        <Link key={i} to={`/products?subcategory=${sub}`} className='block pl-2 mt-1 hover:text-green-500'>{sub}</Link>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    </li>
                     <li><Link className={`${pathname === '/blog' ? 'text-[#059473]' : 'text-slate-600'}`} to='/blog'>Blog</Link></li>
                     <li><Link className={`${pathname === '/about' ? 'text-[#059473]' : 'text-slate-600'}`} to='/about'>About Us</Link></li>
                     <li><Link className={`${pathname === '/contact' ? 'text-[#059473]' : 'text-slate-600'}`} to='/contact'>Contact Us</Link></li>
@@ -124,27 +144,7 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* Categories dropdown mega menu */}
-            <div className='hidden md:block'>
-                <div className='relative'>
-                    <div onClick={() => setCategoryShow(!categoryShow)} className='bg-[#059473] text-white px-4 py-2 flex items-center justify-between cursor-pointer w-64 font-bold'>
-                        <span className='flex items-center gap-2'><FaList /> All Categories</span>
-                        <IoIosArrowDown />
-                    </div>
-                    <div className={`${categoryShow ? 'max-h-[400px]' : 'max-h-0'} overflow-hidden transition-all duration-500 absolute bg-[#dbf3ed] w-64 border`}>
-                        <ul>
-                            {categorys.map((c,i) => (
-                                <li key={i} className='flex items-center gap-2 p-2 hover:bg-green-100 cursor-pointer'>
-                                    <img src={c.image} className='w-6 h-6 rounded-full' alt={c.name} />
-                                    <Link to={`/products?category=${c.name}`}>{c.name}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            {/* Mobile Sidebar */}
+            {/* ===== Mobile Sidebar ===== */}
             <div className={`fixed top-0 left-0 w-64 h-full bg-white z-50 shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}>
                 <div className='flex justify-between items-center p-4'>
                     <Link to='/'><img src="/images/logo.png" alt="logo" className='h-10' /></Link>
@@ -152,7 +152,20 @@ const Header = () => {
                 </div>
                 <ul className='flex flex-col gap-4 px-4 mt-4'>
                     <li><Link to='/' className={`${pathname === '/' ? 'text-[#059473]' : 'text-slate-600'}`}>Home</Link></li>
-                    <li><Link to='/shops' className={`${pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'}`}>Shop</Link></li>
+                    <li className='cursor-pointer' onClick={() => setCategoryShow(!categoryShow)}>Shop
+                        {categoryShow && (
+                            <ul className='pl-4 mt-2'>
+                                {categorys.map((c,i) => (
+                                    <li key={i}>
+                                        <Link to={`/products?category=${c.name}`} className='block py-1'>{c.name}</Link>
+                                        {c.subcategories?.map((sub,i) => (
+                                            <Link key={i} to={`/products?subcategory=${sub}`} className='block pl-2 py-1'>{sub}</Link>
+                                        ))}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </li>
                     <li><Link to='/blog' className={`${pathname === '/blog' ? 'text-[#059473]' : 'text-slate-600'}`}>Blog</Link></li>
                     <li><Link to='/about' className={`${pathname === '/about' ? 'text-[#059473]' : 'text-slate-600'}`}>About</Link></li>
                     <li><Link to='/contact' className={`${pathname === '/contact' ? 'text-[#059473]' : 'text-slate-600'}`}>Contact</Link></li>
@@ -164,8 +177,9 @@ const Header = () => {
                     <FaFacebookF /> <FaTwitter /> <FaLinkedin /> <FaGithub />
                 </div>
             </div>
+
         </div>
-    )
+    );
 };
 
 export default Header;
