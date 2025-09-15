@@ -1,180 +1,171 @@
-import React, { useEffect, useState } from 'react';  
-import { MdEmail } from "react-icons/md";  
-import { IoMdPhonePortrait, IoMdArrowDropdown } from "react-icons/io";  
-import { FaFacebookF, FaList, FaLock, FaUser, FaHeart, FaCartShopping, FaPhoneAlt, FaTrash } from "react-icons/fa";  
-import { FaTwitter, FaLinkedin, FaGithub } from "react-icons/fa6";  
-import { IoIosArrowDown } from "react-icons/io";   
-import { Link, useLocation, useNavigate } from 'react-router-dom';  
-import { useDispatch, useSelector } from 'react-redux';  
-import { get_card_products, get_wishlist_products } from '../store/reducers/cardReducer';  
+import React, { useEffect, useState } from 'react';
+import { MdEmail } from "react-icons/md";
+import { IoMdPhonePortrait } from "react-icons/io";
+import { FaFacebookF, FaList, FaLock, FaUser, FaHeart, FaCartShopping, FaPhoneAlt } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa6";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { IoMdArrowDropdown, IoIosArrowDown } from "react-icons/io";
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_card_products, get_wishlist_products } from '../store/reducers/cardReducer';
 
-const Header = () => {  
-    const dispatch = useDispatch();  
-    const navigate = useNavigate();  
-    const { categorys } = useSelector(state => state.home);  
-    const { userInfo } = useSelector(state => state.auth);  
-    const { card_product_count, wishlist_count, card_products, wishlist_products } = useSelector(state => state.card);  
-    const { pathname } = useLocation();  
+const Header = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { categorys } = useSelector(state => state.home);
+    const { userInfo } = useSelector(state => state.auth);
+    const { card_product_count, wishlist_count } = useSelector(state => state.card);
+    const { pathname } = useLocation();
 
-    const [showSidebar, setShowSidebar] = useState(false);  
-    const [showCategory, setShowCategory] = useState(false);  
-    const [searchValue, setSearchValue] = useState('');  
-    const [category, setCategory] = useState('');  
+    const [showSidebar, setShowSidebar] = useState(false);
+    const [categoryShow, setCategoryShow] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [category, setCategory] = useState('');
 
-    const search = () => navigate(`/products/search?category=${category}&&value=${searchValue}`);  
-    const redirect_card_page = () => navigate(userInfo ? '/card' : '/login');  
+    const search = () => {
+        navigate(`/products/search?category=${category}&value=${searchValue}`);
+    }
 
-    useEffect(() => {  
-        if (userInfo) {  
-            dispatch(get_card_products(userInfo.id));  
-            dispatch(get_wishlist_products(userInfo.id));  
-        }  
-    }, [userInfo]);  
+    const redirect_card_page = () => {
+        if (userInfo) navigate('/card');
+        else navigate('/login');
+    }
 
-    return (  
-        <header className='w-full bg-white shadow-md relative z-50'>  
-            {/* Top Bar */}  
-            <div className='hidden md:flex justify-between items-center bg-[#caddff] px-8 h-10 text-sm text-slate-700'>  
-                <ul className='flex gap-6'>  
-                    <li className='flex items-center gap-1'><MdEmail /> support@gmail.com</li>  
-                    <li className='flex items-center gap-1'><IoMdPhonePortrait /> +(123) 3243 343</li>  
-                </ul>  
-                <div className='flex items-center gap-6'>  
-                    <div className='flex gap-3 text-slate-700'>  
-                        <a href="#"><FaFacebookF /></a>  
-                        <a href="#"><FaTwitter /></a>  
-                        <a href="#"><FaLinkedin /></a>  
-                        <a href="#"><FaGithub /></a>  
-                    </div>  
-                    <div className='relative group cursor-pointer'>  
-                        <img src="/images/language.png" className="w-5 h-5" alt="lang" />  
-                        <IoMdArrowDropdown className="inline ml-1" />  
-                        <ul className='absolute top-6 left-0 hidden group-hover:flex flex-col bg-black text-white rounded p-2 text-sm'>  
-                            <li className='py-1 px-2 hover:bg-gray-700 cursor-pointer'>Hindi</li>  
-                            <li className='py-1 px-2 hover:bg-gray-700 cursor-pointer'>English</li>  
-                        </ul>  
-                    </div>  
-                    {userInfo ?   
-                        <Link to='/dashboard' className='flex items-center gap-1 text-black'><FaUser /> {userInfo.name}</Link> :  
-                        <Link to='/login' className='flex items-center gap-1 text-black'><FaLock /> Login</Link>  
-                    }  
-                </div>  
-            </div>  
+    useEffect(() => {
+        if (userInfo) {
+            dispatch(get_card_products(userInfo.id));
+            dispatch(get_wishlist_products(userInfo.id));
+        }
+    }, [userInfo]);
 
-            {/* Main Header */}  
-            <div className='flex justify-between items-center px-4 md:px-8 py-3 md:py-5'>  
-                <Link to='/'>  
-                    <img src="/images/logo.png" alt="logo" className='h-10 md:h-16' />  
-                </Link>  
+    return (
+        <div className='w-full bg-white sticky top-0 z-50 shadow-md'>
+            {/* Top Bar */}
+            <div className='hidden md:flex justify-between items-center bg-[#caddff] px-6 h-10 text-sm text-slate-700'>
+                <div className='flex gap-6'>
+                    <div className='flex items-center gap-1'><MdEmail /> support@gmail.com</div>
+                    <div className='flex items-center gap-1'><IoMdPhonePortrait /> +(123) 3243 343</div>
+                </div>
+                <div className='flex items-center gap-6'>
+                    <div className='flex gap-3'>
+                        <a href="#"><FaFacebookF /></a>
+                        <a href="#"><FaTwitter /></a>
+                        <a href="#"><FaLinkedin /></a>
+                        <a href="#"><FaGithub /></a>
+                    </div>
+                    {/* Language selector */}
+                    <div className='relative group cursor-pointer flex items-center gap-1'>
+                        <img src="/images/language.png" alt="lang" className='w-5 h-5' />
+                        <IoMdArrowDropdown />
+                        <ul className='absolute top-6 left-0 hidden group-hover:block bg-black text-white p-2 rounded'>
+                            <li className='p-1 cursor-pointer'>English</li>
+                            <li className='p-1 cursor-pointer'>Hindi</li>
+                        </ul>
+                    </div>
+                    {/* User Login/Profile */}
+                    {userInfo ? (
+                        <Link to='/dashboard' className='flex items-center gap-1'>
+                            <FaUser /> {userInfo.name}
+                        </Link>
+                    ) : (
+                        <Link to='/login' className='flex items-center gap-1'>
+                            <FaLock /> Login
+                        </Link>
+                    )}
+                </div>
+            </div>
 
-                <nav className='hidden md:flex items-center gap-6 font-semibold uppercase relative'>  
-                    <Link to='/' className={`${pathname==='/'?'text-[#059473]':'text-slate-600'} hover:text-[#059473]`}>Home</Link>  
-                    <div className='relative group'>  
-                        <Link to='/shops' className={`${pathname==='/shops'?'text-[#059473]':'text-slate-600'} hover:text-[#059473] flex items-center gap-1`}>Shop <IoIosArrowDown /></Link>  
-                        <div className='absolute top-full left-0 w-[600px] p-4 bg-white shadow-lg hidden group-hover:block'>  
-                            <div className='grid grid-cols-3 gap-4'>  
-                                {categorys.map((cat,i) => (  
-                                    <div key={i}>  
-                                        <h3 className='font-bold mb-2'>{cat.name}</h3>  
-                                        {cat.subcategories?.map((sub,i2) => (  
-                                            <Link key={i2} to={`/products?category=${sub}`} className='block text-sm mb-1 hover:text-green-500'>{sub}</Link>  
-                                        ))}  
-                                    </div>  
-                                ))}  
-                            </div>  
-                        </div>  
-                    </div>  
-                    <Link to='/blog' className={`${pathname==='/blog'?'text-[#059473]':'text-slate-600'} hover:text-[#059473]`}>Blog</Link>  
-                    <Link to='/about' className={`${pathname==='/about'?'text-[#059473]':'text-slate-600'} hover:text-[#059473]`}>About</Link>  
-                    <Link to='/contact' className={`${pathname==='/contact'?'text-[#059473]':'text-slate-600'} hover:text-[#059473]`}>Contact</Link>  
-                </nav>  
+            {/* Main Header */}
+            <div className='flex justify-between items-center px-6 py-4'>
+                {/* Logo */}
+                <Link to='/' className='flex items-center'>
+                    <img src="/images/logo.png" alt="logo" className='h-12' />
+                </Link>
 
-                <div className='flex items-center gap-4'>  
-                    <div className='hidden md:flex border rounded overflow-hidden h-10'>  
-                        <select onChange={(e)=>setCategory(e.target.value)} className='px-2 text-slate-600 outline-none bg-transparent border-r'>  
-                            <option value="">All Categories</option>  
-                            {categorys.map((c,i)=> <option key={i} value={c.name}>{c.name}</option>)}  
-                        </select>  
-                        <input type='text' placeholder='Search products...' className='px-2 w-64 outline-none' onChange={(e)=>setSearchValue(e.target.value)} />  
-                        <button onClick={search} className='bg-[#059473] text-white px-4'>Search</button>  
-                    </div>  
+                {/* Navigation */}
+                <ul className='hidden md:flex gap-6 font-bold uppercase'>
+                    <li><Link className={`${pathname === '/' ? 'text-[#059473]' : 'text-slate-600'}`} to='/'>Home</Link></li>
+                    <li><Link className={`${pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'}`} to='/shops'>Shop</Link></li>
+                    <li><Link className={`${pathname === '/blog' ? 'text-[#059473]' : 'text-slate-600'}`} to='/blog'>Blog</Link></li>
+                    <li><Link className={`${pathname === '/about' ? 'text-[#059473]' : 'text-slate-600'}`} to='/about'>About Us</Link></li>
+                    <li><Link className={`${pathname === '/contact' ? 'text-[#059473]' : 'text-slate-600'}`} to='/contact'>Contact Us</Link></li>
+                </ul>
 
-                    <div className='hidden md:flex items-center gap-4'>  
-                        <div className='relative group cursor-pointer' onClick={()=>navigate(userInfo?'/dashboard/my-wishlist':'/login')}>  
-                            <FaHeart className='text-xl text-green-500' />  
-                            {wishlist_count!==0 && <span className='absolute -top-1 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs'>{wishlist_count}</span>}  
-                        </div>  
+                {/* Search & Cart/Wishlist */}
+                <div className='flex items-center gap-4'>
+                    {/* Category dropdown */}
+                    <select onChange={(e) => setCategory(e.target.value)} className='hidden md:block border px-2 py-1 rounded'>
+                        <option value=''>All Categories</option>
+                        {categorys.map((c,i) => <option key={i} value={c.name}>{c.name}</option>)}
+                    </select>
+                    <div className='relative'>
+                        <input type='text' placeholder='Search Products' value={searchValue} onChange={e => setSearchValue(e.target.value)} className='border rounded-l px-2 py-1 w-64 md:w-80' />
+                        <button onClick={search} className='bg-[#059473] text-white px-4 py-1 rounded-r'>Search</button>
+                    </div>
+                    {/* Wishlist */}
+                    <div onClick={() => navigate(userInfo ? '/dashboard/my-wishlist' : '/login')} className='relative cursor-pointer'>
+                        <FaHeart className='text-xl text-green-500' />
+                        {wishlist_count > 0 && (
+                            <span className='absolute -top-2 -right-2 bg-red-500 text-white w-4 h-4 text-xs flex items-center justify-center rounded-full'>{wishlist_count}</span>
+                        )}
+                    </div>
+                    {/* Cart */}
+                    <div onClick={redirect_card_page} className='relative cursor-pointer'>
+                        <FaCartShopping className='text-xl text-green-500' />
+                        {card_product_count > 0 && (
+                            <span className='absolute -top-2 -right-2 bg-red-500 text-white w-4 h-4 text-xs flex items-center justify-center rounded-full'>{card_product_count}</span>
+                        )}
+                    </div>
+                </div>
 
-                        <div className='relative group cursor-pointer' onClick={redirect_card_page}>  
-                            <FaCartShopping className='text-xl text-green-500' />  
-                            {card_product_count!==0 && <span className='absolute -top-1 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs'>{card_product_count}</span>}  
-                        </div>  
-                    </div>  
+                {/* Mobile Hamburger */}
+                <div className='md:hidden flex items-center'>
+                    <button onClick={() => setShowSidebar(true)} className='text-2xl'><FaList /></button>
+                </div>
+            </div>
 
-                    <div className='md:hidden cursor-pointer' onClick={()=>setShowSidebar(true)}>  
-                        <FaList className='text-2xl' />  
-                    </div>  
-                </div>  
-            </div>  
+            {/* Categories dropdown mega menu */}
+            <div className='hidden md:block'>
+                <div className='relative'>
+                    <div onClick={() => setCategoryShow(!categoryShow)} className='bg-[#059473] text-white px-4 py-2 flex items-center justify-between cursor-pointer w-64 font-bold'>
+                        <span className='flex items-center gap-2'><FaList /> All Categories</span>
+                        <IoIosArrowDown />
+                    </div>
+                    <div className={`${categoryShow ? 'max-h-[400px]' : 'max-h-0'} overflow-hidden transition-all duration-500 absolute bg-[#dbf3ed] w-64 border`}>
+                        <ul>
+                            {categorys.map((c,i) => (
+                                <li key={i} className='flex items-center gap-2 p-2 hover:bg-green-100 cursor-pointer'>
+                                    <img src={c.image} className='w-6 h-6 rounded-full' alt={c.name} />
+                                    <Link to={`/products?category=${c.name}`}>{c.name}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-            {/* Mobile Sidebar */}  
-            <div className={`fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${showSidebar?'opacity-100 visible':'opacity-0 invisible'}`} onClick={()=>setShowSidebar(false)}></div>  
-            <div className={`fixed top-0 left-0 w-72 bg-white h-full z-50 p-6 overflow-y-auto transform transition-transform duration-300 ${showSidebar?'translate-x-0':'-translate-x-full'}`}>  
-                <div className='flex justify-between items-center mb-6'>  
-                    <Link to='/' onClick={()=>setShowSidebar(false)}>  
-                        <img src="/images/logo.png" alt="logo" className='h-10' />  
-                    </Link>  
-                    <button onClick={()=>setShowSidebar(false)} className='text-xl font-bold'>×</button>  
-                </div>  
-
-                <ul className='flex flex-col gap-4'>  
-                    <li><Link to='/' onClick={()=>setShowSidebar(false)}>Home</Link></li>  
-                    <li>  
-                        <button className='flex justify-between w-full font-semibold' onClick={()=>setShowCategory(!showCategory)}>Shop <IoIosArrowDown /></button>  
-                        {showCategory &&   
-                            <ul className='ml-4 mt-2 flex flex-col gap-1'>  
-                                {categorys.map((cat,i)=>(  
-                                    <li key={i}><Link to={`/products?category=${cat.name}`} onClick={()=>setShowSidebar(false)}>{cat.name}</Link></li>  
-                                ))}  
-                            </ul>  
-                        }  
-                    </li>  
-                    <li><Link to='/blog' onClick={()=>setShowSidebar(false)}>Blog</Link></li>  
-                    <li><Link to='/about' onClick={()=>setShowSidebar(false)}>About</Link></li>  
-                    <li><Link to='/contact' onClick={()=>setShowSidebar(false)}>Contact</Link></li>  
-                </ul>  
-
-                <div className='mt-6 border-t pt-4 flex items-center gap-3'>  
-                    <FaPhoneAlt /> <span>+1343-43233455 Support 24/7</span>  
-                </div>  
-                <div className='mt-4 flex items-center gap-3 text-slate-700'>  
-                    <a href="#"><FaFacebookF /></a>  
-                    <a href="#"><FaTwitter /></a>  
-                    <a href="#"><FaLinkedin /></a>  
-                    <a href="#"><FaGithub /></a>  
-                </div>  
-            </div>  
-
-            {/* Mobile Bottom Nav */}  
-            <div className='fixed bottom-0 left-0 w-full md:hidden bg-white border-t flex justify-between items-center px-6 h-16 z-50'>  
-                <Link to='/' className='flex flex-col items-center text-slate-700'><span className='text-xl'>🏠</span><span className='text-xs'>Home</span></Link>  
-                <button onClick={()=>setShowCategory(!showCategory)} className='flex flex-col items-center text-slate-700'><FaList /><span className='text-xs'>Categories</span></button>  
-                <button onClick={redirect_card_page} className='relative flex flex-col items-center text-slate-700'>  
-                    <FaCartShopping />  
-                    {card_product_count!==0 && <span className='absolute -top-1 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs'>{card_product_count}</span>}  
-                    <span className='text-xs'>Cart</span>  
-                </button>  
-                <button onClick={()=>navigate(userInfo?'/dashboard/my-wishlist':'/login')} className='relative flex flex-col items-center text-slate-700'>  
-                    <FaHeart />  
-                    {wishlist_count!==0 && <span className='absolute -top-1 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs'>{wishlist_count}</span>}  
-                    <span className='text-xs'>Wishlist</span>  
-                </button>  
-                <button onClick={()=>navigate(userInfo?'/dashboard':'/login')} className='flex flex-col items-center text-slate-700'>  
-                    <FaUser /> <span className='text-xs'>{userInfo?'Account':'Login'}</span>  
-                </button>  
-            </div>  
-        </header>  
-    );  
-};  
+            {/* Mobile Sidebar */}
+            <div className={`fixed top-0 left-0 w-64 h-full bg-white z-50 shadow-lg transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}>
+                <div className='flex justify-between items-center p-4'>
+                    <Link to='/'><img src="/images/logo.png" alt="logo" className='h-10' /></Link>
+                    <button onClick={() => setShowSidebar(false)} className='text-xl font-bold'>&times;</button>
+                </div>
+                <ul className='flex flex-col gap-4 px-4 mt-4'>
+                    <li><Link to='/' className={`${pathname === '/' ? 'text-[#059473]' : 'text-slate-600'}`}>Home</Link></li>
+                    <li><Link to='/shops' className={`${pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'}`}>Shop</Link></li>
+                    <li><Link to='/blog' className={`${pathname === '/blog' ? 'text-[#059473]' : 'text-slate-600'}`}>Blog</Link></li>
+                    <li><Link to='/about' className={`${pathname === '/about' ? 'text-[#059473]' : 'text-slate-600'}`}>About</Link></li>
+                    <li><Link to='/contact' className={`${pathname === '/contact' ? 'text-[#059473]' : 'text-slate-600'}`}>Contact</Link></li>
+                </ul>
+                <div className='px-4 mt-6 flex items-center gap-3'>
+                    <FaPhoneAlt /> <span>+123 4323 343</span>
+                </div>
+                <div className='px-4 mt-4 flex gap-4'>
+                    <FaFacebookF /> <FaTwitter /> <FaLinkedin /> <FaGithub />
+                </div>
+            </div>
+        </div>
+    )
+};
 
 export default Header;
