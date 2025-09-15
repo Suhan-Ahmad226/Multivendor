@@ -298,12 +298,12 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
 
       {/* Main header */}
       <div
-        className="flex items-center justify-between px-4 md:px-6 py-3 bg-white shadow-sm"
+        className="flex items-center justify-between px-4 md:px-6 py-3 bg-white shadow-sm flex-wrap"
         role="navigation"
         aria-label="main navigation"
       >
         {/* Left: Logo + Hamburger on mobile */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             className="md:hidden text-2xl p-2 rounded hover:bg-slate-100 transition-colors duration-200"
             aria-label="Open menu"
@@ -323,7 +323,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
         </div>
 
         {/* Center: Navigation (desktop) + Search */}
-        <div className="flex-1 flex flex-col md:flex-row items-center justify-center md:justify-between gap-2 md:gap-6">
+        <div className="flex-1 flex flex-col md:flex-row items-center justify-center md:justify-between gap-2 md:gap-6 min-w-0">
           {/* Desktop nav with hover animations */}
           <nav className="hidden md:flex items-center gap-4 font-semibold uppercase text-sm">
             <Link
@@ -357,7 +357,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
                 <div
                   onMouseEnter={() => setShowMegaMenu(true)}
                   onMouseLeave={() => setShowMegaMenu(false)}
-                  className="absolute left-0 mt-2 w-[900px] bg-white border shadow-lg p-4 grid grid-cols-4 gap-4 z-40 animate-fade-in"
+                  className="absolute left-0 mt-2 w-full max-w-[900px] bg-white border shadow-lg p-4 grid grid-cols-4 gap-4 z-40 animate-fade-in"
                   role="menu"
                 >
                   {/* Categories grid with images */}
@@ -471,7 +471,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
           </nav>
 
           {/* Search bar */}
-          <div className="w-full md:w-[520px] relative" ref={searchRef}>
+          <div className="w-full max-w-[520px] relative" ref={searchRef}>
             <form
               onSubmit={handleSearchSubmit}
               className="flex items-stretch bg-slate-50 border rounded overflow-hidden"
