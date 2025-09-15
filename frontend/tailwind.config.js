@@ -4,16 +4,31 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
-    screens: {
-      'xl': {'max': '1200px'},
-      'lg': {'max': '1080px'},
-      'md-lg': {'max': '991px'},
-      'md': {'max': '768px'},
-      'sm': {'max': '576px'},
-      'xs': {'max': '480px'},
-      '2xs': {'max': '340px'},
-    }
+    extend: {
+      screens: {
+        'xl': {'max': '1200px'},
+        'lg': {'max': '1080px'},
+        'md-lg': {'max': '991px'},
+        'md': {'max': '768px'},
+        'sm': {'max': '576px'},
+        'xs': {'max': '480px'},
+        '2xs': {'max': '340px'},
+      },
+      keyframes: {
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(-10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-down": {
+          "0%": { opacity: "0", transform: "translateY(-5px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.3s ease-out forwards",
+        "slide-down": "slide-down 0.3s ease-out forwards",
+      },
+    },
   },
   plugins: [],
-}
+};
