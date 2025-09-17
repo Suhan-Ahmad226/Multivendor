@@ -186,7 +186,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
   return (
     <header className="w-full sticky top-0 z-50">
       {/* Top promo/contact bar - visible on md+ */}
-      <div
+      {/*  <div
         className="hidden md:flex justify-between items-center bg-gradient-to-r from-blue-50 to-emerald-50 px-6 h-10 text-sm text-slate-700 transition-colors duration-300"
         aria-hidden={false}
       >
@@ -198,9 +198,8 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             </a>
           </div>
         </div>
-
         <div className="flex items-center gap-6">
-          {/* social links with hover animations */}
+
           <nav className="flex gap-3" aria-label="social links">
             <a
               href="#"
@@ -223,10 +222,10 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             >
               <FaInstagram />
             </a>
-          </nav>
+          </nav> */}
 
           {/* Login/Profile with hover effect */}
-          <div ref={accountRef} className="relative group">
+      {/*  <div ref={accountRef} className="relative group">
             {userInfo ? (
               <button
                 className="flex items-center gap-2 px-2 py-1 rounded transition-colors duration-300 group-hover:bg-white/30"
@@ -251,7 +250,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
                 <FaLock />
                 <span>Login</span>
               </Link>
-            )}
+            )}*/}
 
             {/* Account dropdown */}
             {userInfo && showAccountDropdown && (
@@ -929,14 +928,14 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             )}
             <div className="text-xs mt-1">Cart</div>
           </button>
-          <button
+          {/* <button
             onClick={() => navigate(userInfo ? "/dashboard" : "/login")}
             className="w-1/5 py-2 text-center text-sm flex flex-col items-center justify-center transition-colors duration-200 hover:text-emerald-600"
             aria-label="Account"
           >
             <FaUser className="text-xl" />
             <div className="text-xs mt-1">Account</div>
-          </button>
+          </button> */}
         </div>
       </nav>
     </header>
