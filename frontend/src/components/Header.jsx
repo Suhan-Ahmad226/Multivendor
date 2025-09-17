@@ -252,7 +252,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
               </Link>
             )}*/}
 
-            {/* Account dropdown */}
+            {/* Account dropdown 
             {userInfo && showAccountDropdown && (
               <div
                 role="menu"
@@ -290,7 +290,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main header - Desktop */}
       <div
