@@ -12,7 +12,7 @@ import {
   FaLock,
   FaUser,
   FaHeart,
-  FaCartPlus,
+  FaShoppingCart,
   FaSearch,
   FaBell,
   FaGlobe,
@@ -27,6 +27,11 @@ import {
   FaGift,
   FaSignInAlt,
   FaSignOutAlt,
+  FaShopify,
+  FaTags,
+  FaInfoCircle,
+  FaBlog,
+  FaHeadset
 } from "react-icons/fa";
 
 /* Example actions - adapt to your store */
@@ -58,16 +63,13 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
 
   // UI state
   const [showSidebar, setShowSidebar] = useState(false);
-  const [categoryShow, setCategoryShow] = useState(false);
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [showCartPreview, setShowCartPreview] = useState(false);
   const [showWishlistPreview, setShowWishlistPreview] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState([]);
-  const [showSearchOverlay, setShowSearchOverlay] = useState(false);
   const [showMegaMenu, setShowMegaMenu] = useState(false);
-  const [language, setLanguage] = useState("EN");
   const [notifications] = useState([
     { id: 1, text: "10% off on your next order!" },
     { id: 2, text: "Order #324 shipped" },
@@ -134,8 +136,9 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
       const pool = mockProducts.length ? mockProducts : fallbackProducts;
       const q = searchValue.toLowerCase();
       const matches = pool
-        .filter((p) => p.toLowerCase().includes(q))
-        .slice(0, 8);
+        .filter((p) => (typeof p === 'string' ? p.toLowerCase().includes(q) : p.name.toLowerCase().includes(q)))
+        .slice(0, 8)
+        .map(p => typeof p === 'string' ? p : p.name); // Ensure suggestions are strings
       setSearchSuggestions(matches);
     }, 180);
     return () => clearTimeout(t);
@@ -151,13 +154,8 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
           categoryFilter || ""
         )}&value=${encodeURIComponent(q)}`
       );
-      setShowSearchOverlay(false);
+      setSearchSuggestions([]);
     }
-  };
-
-  const redirect_card_page = () => {
-    if (userInfo) navigate("/card");
-    else navigate("/login");
   };
 
   const handleSuggestionClick = (s) => {
@@ -175,7 +173,6 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
     const keyHandler = (e) => {
       if (e.key === "Escape") {
         setShowSidebar(false);
-        setShowSearchOverlay(false);
         setShowAccountDropdown(false);
         setShowCartPreview(false);
         setShowWishlistPreview(false);
@@ -296,22 +293,14 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
         </div>
       </div>
 
-      {/* Main header */}
+      {/* Main header - Desktop */}
       <div
-        className="flex items-center justify-between px-4 md:px-6 py-3 bg-white shadow-sm"
+        className="hidden md:flex flex-col bg-white shadow-sm"
         role="navigation"
         aria-label="main navigation"
       >
-        {/* Left: Logo + Hamburger on mobile */}
-        <div className="flex items-center gap-3">
-          <button
-            className="md:hidden text-2xl p-2 rounded hover:bg-slate-100 transition-colors duration-200"
-            aria-label="Open menu"
-            onClick={() => setShowSidebar(true)}
-          >
-            <FaBars />
-          </button>
-
+        {/* Top bar with Logo, Search, and Icons */}
+        <div className="flex items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-2">
             <img
               src={logoSrc}
@@ -320,15 +309,251 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             />
             <span className="sr-only">Go to homepage</span>
           </Link>
+
+          {/* Search bar */}
+          <div className="flex-1 max-w-2xl mx-6 relative" ref={searchRef}>
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex items-stretch bg-slate-50 border rounded-full overflow-hidden shadow-sm"
+              role="search"
+              aria-label="Search products"
+            >
+              <div className="relative group">
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="hidden md:block px-4 py-2 border-r border-slate-200 bg-transparent text-sm cursor-pointer focus:outline-none appearance-none pr-8"
+                  aria-label="Category filter"
+                >
+                  <option value="">All Categories</option>
+                  {categorys.map((c, i) => (
+                    <option key={i} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <FaAngleDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
+
+              <input
+                type="text"
+                value={searchValue}
+                onFocus={() => setSearchSuggestions(true)}
+                onChange={(e) => setSearchValue(e.target.value)}
+                placeholder="Search for products..."
+                className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
+                aria-label="Search input"
+              />
+              <button
+                type="submit"
+                className="bg-emerald-600 text-white px-6 flex items-center gap-2 transition-all duration-300 hover:bg-emerald-700"
+                aria-label="Search"
+              >
+                <FaSearch />
+              </button>
+            </form>
+
+            {/* Suggestions dropdown with animation */}
+            {searchSuggestions.length > 0 && (
+              <ul
+                className="absolute mt-1 w-full bg-white border rounded-lg shadow-xl z-50 max-h-60 overflow-auto animate-slide-down"
+                role="listbox"
+              >
+                {searchSuggestions.map((s, idx) => (
+                  <li
+                    key={idx}
+                    role="option"
+                    tabIndex={0}
+                    onClick={() => handleSuggestionClick(s)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSuggestionClick(s);
+                    }}
+                    className="px-4 py-3 hover:bg-emerald-50 cursor-pointer transition-colors duration-200"
+                  >
+                    <FaSearch className="inline mr-2 text-slate-400" />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Right: Icons */}
+          <div className="flex items-center gap-6 text-slate-600">
+            {/* Wishlist */}
+            <div ref={wishlistRef} className="relative group">
+              <button
+                className="flex flex-col items-center p-2 rounded-full transition-colors duration-200 hover:bg-slate-100"
+                aria-label="Wishlist"
+                onClick={() => {
+                  if (!userInfo) navigate("/login");
+                  else setShowWishlistPreview((s) => !s);
+                }}
+              >
+                <FaHeart className="text-xl text-emerald-600" />
+                {wishlist_count > 0 && (
+                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                    {wishlist_count}
+                  </span>
+                )}
+                <span className="text-xs mt-1">Wishlist</span>
+              </button>
+              {showWishlistPreview && userInfo && (
+                <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg p-2 z-50 animate-fade-in">
+                  <div className="text-sm font-semibold mb-2">My Wishlist</div>
+                  <div className="text-xs text-slate-500">
+                    You have {wishlist_count} items.
+                  </div>
+                  <Link
+                    to="/dashboard/my-wishlist"
+                    className="block mt-3 text-emerald-600 text-sm hover:underline"
+                  >
+                    View wishlist
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Cart */}
+            <div ref={cartRef} className="relative group">
+              <button
+                onClick={() => {
+                  if (!userInfo) navigate("/login");
+                  else setShowCartPreview((s) => !s);
+                }}
+                aria-label="Cart"
+                className="flex flex-col items-center p-2 rounded-full transition-colors duration-200 hover:bg-slate-100"
+              >
+                <FaShoppingCart className="text-xl text-emerald-600" />
+                {card_product_count > 0 && (
+                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                    {card_product_count}
+                  </span>
+                )}
+                <span className="text-xs mt-1">Cart</span>
+              </button>
+
+              {/* cart preview with animation */}
+              {showCartPreview && userInfo && (
+                <div className="absolute right-0 mt-2 w-80 bg-white border rounded-lg shadow-lg p-3 z-50 animate-fade-in">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold text-lg">My Cart</div>
+                    <div className="text-xs text-slate-500">
+                      {card_product_count} items
+                    </div>
+                  </div>
+
+                  <div className="mt-2 divide-y">
+                    {card_products.length > 0 ? (
+                      card_products.slice(0, 4).map((p, i) => (
+                        <div
+                          key={i}
+                          className="py-2 flex items-center gap-3 transition-transform duration-300 hover:translate-x-1"
+                        >
+                          <img
+                            src={p.image || "/images/p-thumb-1.jpg"}
+                            alt={p.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="flex-1">
+                            <div className="text-sm font-medium">{p.name}</div>
+                            <div className="text-xs text-slate-500">
+                              ${p.price}
+                            </div>
+                          </div>
+                          <div className="text-sm font-semibold text-emerald-600">${p.price}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-4 text-sm text-center text-slate-500">
+                        Your cart is empty
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      onClick={() => navigate("/card")}
+                      className="flex-1 bg-emerald-600 text-white py-2 rounded-lg transition-colors duration-300 hover:bg-emerald-700"
+                    >
+                      View Cart
+                    </button>
+                    <button
+                      onClick={() => navigate("/checkout")}
+                      className="flex-1 border border-slate-300 rounded-lg py-2 transition-colors duration-300 hover:bg-slate-100"
+                    >
+                      Checkout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+{/* Account */}
+            <div ref={accountRef} className="relative group">
+              <button
+                className="flex flex-col items-center p-2 rounded-full transition-colors duration-200 hover:bg-slate-100"
+                onClick={() => setShowAccountDropdown((s) => !s)}
+                aria-haspopup="menu"
+                aria-expanded={showAccountDropdown}
+              >
+                <FaUser className="text-xl" />
+                <span className="text-xs mt-1">Account</span>
+              </button>
+              {userInfo && showAccountDropdown && (
+                <div
+                  role="menu"
+                  aria-label="User menu"
+                  className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg p-2 text-sm animate-fade-in"
+                >
+                  <Link
+                    to="/dashboard"
+                    className="block py-2 px-3 hover:bg-emerald-50 rounded transition-colors duration-200"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/dashboard/orders"
+                    className="block py-2 px-3 hover:bg-emerald-50 rounded transition-colors duration-200"
+                  >
+                    Orders
+                  </Link>
+                  <Link
+                    to="/dashboard/my-wishlist"
+                    className="block py-2 px-3 hover:bg-emerald-50 rounded transition-colors duration-200"
+                  >
+                    Wishlist
+                  </Link>
+                  <button
+                    onClick={() => {
+                      // dispatch(logout()) // add your logout
+                      navigate("/logout");
+                    }}
+                    className="w-full text-left mt-2 py-2 px-3 text-red-600 hover:bg-red-50 rounded transition-colors duration-200"
+                  >
+                    <FaSignOutAlt className="inline mr-2" /> Logout
+                  </button>
+                </div>
+              )}
+              {!userInfo && !showAccountDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg p-2 text-sm animate-fade-in">
+                  <Link
+                    to="/login"
+                    className="block py-2 px-3 bg-emerald-600 text-white text-center rounded-lg transition-colors duration-300 hover:bg-emerald-700"
+                  >
+                    <FaSignInAlt className="inline mr-2" /> Login
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Center: Navigation (desktop) + Search */}
-        <div className="flex-1 flex flex-col md:flex-row items-center justify-center md:justify-between gap-2 md:gap-6">
-          {/* Desktop nav with hover animations */}
-          <nav className="hidden md:flex items-center gap-4 font-semibold uppercase text-sm">
+        {/* Bottom navigation bar */}
+        <div className="bg-white border-t border-slate-200 shadow-sm">
+          <nav className="max-w-7xl mx-auto flex items-center justify-start gap-4 font-semibold text-sm px-6 py-2">
             <Link
               to="/"
-              className={`px-2 py-1 rounded transition-all duration-300 ${
+              className={`px-3 py-2 rounded transition-all duration-300 ${
                 pathname === "/" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
               }`}
             >
@@ -337,8 +562,8 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
 
             <div className="relative group" ref={megaRef}>
               <button
-                className={`px-2 py-1 rounded flex items-center gap-2 transition-all duration-300 group-hover:text-emerald-600 ${
-                  pathname.startsWith("/shops")
+                className={`px-3 py-2 rounded flex items-center gap-2 transition-all duration-300 group-hover:text-emerald-600 ${
+                  pathname.startsWith("/products")
                     ? "text-emerald-600 font-bold"
                     : "text-slate-600"
                 }`}
@@ -357,23 +582,24 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
                 <div
                   onMouseEnter={() => setShowMegaMenu(true)}
                   onMouseLeave={() => setShowMegaMenu(false)}
-                  className="absolute left-0 mt-2 w-[900px] bg-white border shadow-lg p-4 grid grid-cols-4 gap-4 z-40 animate-fade-in"
+                  className="absolute left-0 mt-2 w-fit bg-white border rounded-lg shadow-xl p-6 grid grid-cols-4 gap-6 z-40 animate-fade-in"
                   role="menu"
                 >
                   {/* Categories grid with images */}
                   <div className="col-span-2">
-                    <h4 className="text-sm font-bold mb-2">Categories</h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <h4 className="text-md font-bold text-slate-800 mb-3">Shop by Category</h4>
+                    <div className="grid grid-cols-2 gap-4">
                       {categorys.slice(0, 8).map((c, i) => (
                         <Link
                           key={i}
                           to={`/products?category=${encodeURIComponent(c.name)}`}
-                          className="flex items-center gap-3 p-2 rounded hover:bg-emerald-50 transition-colors duration-200 group"
+                          className="flex items-start gap-3 p-3 rounded-lg hover:bg-emerald-50 transition-colors duration-200 group"
+                          onClick={() => setShowMegaMenu(false)}
                         >
                           <CategoryImage src={c.image} alt={c.name} />
                           <div>
-                            <div className="font-semibold">{c.name}</div>
-                            <div className="text-xs text-slate-500">
+                            <div className="font-semibold text-slate-800">{c.name}</div>
+                            <div className="text-xs text-slate-500 mt-1">
                               {c.sub?.slice(0, 3)?.join(", ")}
                             </div>
                           </div>
@@ -384,46 +610,46 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
 
                   {/* Featured / banner */}
                   <div className="col-span-2">
-                    <h4 className="text-sm font-bold mb-2">Featured</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded p-4 flex flex-col justify-between transition-transform duration-300 hover:scale-[1.02]">
+                    <h4 className="text-md font-bold text-slate-800 mb-3">Featured & Deals</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-lg p-5 flex flex-col justify-between transition-transform duration-300 hover:scale-[1.02] transform">
                         <div>
-                          <div className="text-sm font-bold">Summer Sale</div>
-                          <div className="text-xs text-slate-600">
+                          <div className="text-sm font-bold text-emerald-800">Summer Sale</div>
+                          <div className="text-xs text-slate-600 mt-1">
                             Up to 50% off select items
                           </div>
                         </div>
                         <img
                           src="/images/mega-banner-1.jpg"
                           alt="sale"
-                          className="w-full h-24 object-cover rounded mt-3"
+                          className="w-full h-24 object-contain rounded mt-3"
                         />
                       </div>
-                      <div className="bg-slate-50 rounded p-4 transition-transform duration-300 hover:scale-[1.02]">
-                        <div className="text-sm font-bold">Top Picks</div>
-                        <div className="mt-2 grid gap-2">
-                          <div className="flex items-center gap-2">
+                      <div className="bg-slate-50 rounded-lg p-5 transition-transform duration-300 hover:scale-[1.02] transform">
+                        <div className="text-sm font-bold text-slate-800">Top Picks</div>
+                        <div className="mt-3 grid gap-2">
+                          <div className="flex items-center gap-3">
                             <img
                               src="/images/p-thumb-1.jpg"
                               alt=""
-                              className="w-12 h-12 rounded object-cover"
+                              className="w-12 h-12 rounded-lg object-cover"
                             />
                             <div>
-                              <div className="text-xs">Wireless Speaker</div>
-                              <div className="text-xs text-slate-500">
+                              <div className="text-sm font-medium">Wireless Speaker</div>
+                              <div className="text-xs text-emerald-600">
                                 From $29
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <img
                               src="/images/p-thumb-2.jpg"
                               alt=""
-                              className="w-12 h-12 rounded object-cover"
+                              className="w-12 h-12 rounded-lg object-cover"
                             />
                             <div>
-                              <div className="text-xs">Running Shoes</div>
-                              <div className="text-xs text-slate-500">
+                              <div className="text-sm font-medium">Running Shoes</div>
+                              <div className="text-xs text-emerald-600">
                                 From $49
                               </div>
                             </div>
@@ -437,84 +663,119 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             </div>
 
             <Link
+              to="/brands"
+              className={`px-3 py-2 rounded flex items-center gap-2 transition-all duration-300 ${
+                pathname === "/brands" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
+              }`}
+            >
+              <FaShopify className="text-sm" />
+              Brands
+            </Link>
+            <Link
               to="/deals"
-              className={`px-2 py-1 rounded transition-all duration-300 ${
+              className={`px-3 py-2 rounded flex items-center gap-2 transition-all duration-300 ${
                 pathname === "/deals" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
               }`}
             >
+              <FaTags className="text-sm" />
               Deals
             </Link>
             <Link
-              to="/blog"
-              className={`px-2 py-1 rounded transition-all duration-300 ${
-                pathname === "/blog" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
-              }`}
-            >
-              Blog
-            </Link>
-            <Link
               to="/about"
-              className={`px-2 py-1 rounded transition-all duration-300 ${
+              className={`px-3 py-2 rounded flex items-center gap-2 transition-all duration-300 ${
                 pathname === "/about" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
               }`}
             >
-              About
+              <FaInfoCircle className="text-sm" />
+              About Us
+            </Link>
+            <Link
+              to="/blog"
+              className={`px-3 py-2 rounded flex items-center gap-2 transition-all duration-300 ${
+                pathname === "/blog" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
+              }`}
+            >
+              <FaBlog className="text-sm" />
+              Blog
             </Link>
             <Link
               to="/contact"
-              className={`px-2 py-1 rounded transition-all duration-300 ${
+              className={`px-3 py-2 rounded flex items-center gap-2 transition-all duration-300 ${
                 pathname === "/contact" ? "text-emerald-600 font-bold" : "text-slate-600 hover:text-emerald-600"
               }`}
             >
+              <FaHeadset className="text-sm" />
               Contact
             </Link>
           </nav>
+        </div>
+      </div>
 
-          {/* Search bar */}
-          <div className="w-full md:w-[520px] relative" ref={searchRef}>
+      {/* Mobile header */}
+      <div className="md:hidden">
+        {/* Top bar with hamburger, logo, and icons */}
+        <div className="flex items-center justify-between px-4 py-3 bg-white shadow-sm">
+          <button
+            className="text-2xl p-2 rounded hover:bg-slate-100 transition-colors duration-200"
+            aria-label="Open menu"
+            onClick={() => setShowSidebar(true)}
+          >
+            <FaBars />
+          </button>
+          <Link to="/">
+            <img src={logoSrc} alt="logo" className="h-8" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/card")}
+              aria-label="Cart"
+              className="p-2 rounded hover:bg-slate-100 transition-colors duration-200 relative"
+            >
+              <FaShoppingCart className="text-xl" />
+              {card_product_count > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                  {card_product_count}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => navigate(userInfo ? "/dashboard" : "/login")}
+              aria-label="Account"
+              className="p-2 rounded hover:bg-slate-100 transition-colors duration-200"
+            >
+              <FaUser className="text-xl" />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile search bar */}
+        <div className="px-4 py-2 bg-white border-b border-slate-200">
+          <div className="relative" ref={searchRef}>
             <form
               onSubmit={handleSearchSubmit}
-              className="flex items-stretch bg-slate-50 border rounded overflow-hidden"
+              className="flex items-stretch bg-slate-50 border rounded-full overflow-hidden"
               role="search"
-              aria-label="Search products"
             >
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="hidden md:block px-2 border-r bg-transparent text-sm cursor-pointer focus:outline-none"
-                aria-label="Category filter"
-              >
-                <option value="">All Categories</option>
-                {categorys.map((c, i) => (
-                  <option key={i} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-
               <input
                 type="text"
                 value={searchValue}
-                onFocus={() => setShowSearchOverlay(true)}
+                onFocus={() => setSearchSuggestions(true)}
                 onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Search products, brands and categories..."
-                className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
-                aria-label="Search input"
+                placeholder="Search products..."
+                className="flex-1 px-4 py-2 text-sm bg-transparent focus:outline-none"
+                aria-label="mobile search input"
               />
               <button
                 type="submit"
-                className="bg-emerald-600 text-white px-4 py-2 flex items-center gap-2 transition-all duration-300 hover:bg-emerald-700"
+                className="bg-emerald-600 text-white px-4 flex items-center transition-colors duration-200 hover:bg-emerald-700"
                 aria-label="Search"
               >
                 <FaSearch />
-                <span className="hidden md:inline">Search</span>
               </button>
             </form>
-
-        {/* Suggestions dropdown with animation */}
             {searchSuggestions.length > 0 && (
               <ul
-                className="absolute mt-1 w-full bg-white border rounded shadow-md z-50 max-h-60 overflow-auto animate-slide-down"
+                className="absolute mt-1 w-full bg-white border rounded-lg shadow-xl z-50 max-h-60 overflow-auto animate-slide-down"
                 role="listbox"
               >
                 {searchSuggestions.map((s, idx) => (
@@ -526,7 +787,7 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleSuggestionClick(s);
                     }}
-                    className="px-3 py-2 hover:bg-emerald-50 cursor-pointer transition-colors duration-200"
+                    className="px-4 py-3 hover:bg-emerald-50 cursor-pointer transition-colors duration-200"
                   >
                     {s}
                   </li>
@@ -535,149 +796,13 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             )}
           </div>
         </div>
-
-        {/* Right: icons */}
-        <div className="flex items-center gap-4">
-          {/* Notifications */}
-          <div className="relative group">
-            <button
-              className="p-2 rounded hover:bg-slate-100 transition-colors duration-200"
-              aria-label="Notifications"
-            >
-              <FaBell />
-              {notifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                  {notifications.length}
-                </span>
-              )}
-            </button>
-          </div>
-          {/* Wishlist */}
-          <div ref={wishlistRef} className="relative group">
-            <button
-              className="p-2 rounded hover:bg-slate-100 transition-colors duration-200"
-              aria-label="Wishlist"
-              onClick={() => {
-                if (!userInfo) navigate("/login");
-                else setShowWishlistPreview((s) => !s);
-              }}
-            >
-              <FaHeart className="text-emerald-600" />
-              {wishlist_count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                  {wishlist_count}
-                </span>
-              )}
-            </button>
-
-            {showWishlistPreview && userInfo && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border rounded shadow-lg p-2 z-50 animate-fade-in">
-                <div className="text-sm font-semibold mb-2">Wishlist</div>
-                <div className="text-xs text-slate-500">
-                  You have {wishlist_count} items
-                </div>
-                <Link
-                  to="/dashboard/my-wishlist"
-                  className="block mt-3 text-emerald-600 text-sm hover:underline"
-                >
-                  View wishlist
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Cart */}
-          <div ref={cartRef} className="relative group">
-            <button
-              onClick={() => {
-                if (!userInfo) navigate("/login");
-                else setShowCartPreview((s) => !s);
-              }}
-              aria-label="Cart"
-              className="p-2 rounded hover:bg-slate-100 transition-colors duration-200"
-            >
-              <FaCartPlus className="text-emerald-600" />
-              {card_product_count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                  {card_product_count}
-                </span>
-              )}
-            </button>
-
-            {/* cart preview with animation */}
-            {showCartPreview && userInfo && (
-              <div className="absolute right-0 mt-2 w-80 bg-white border rounded shadow-lg p-3 z-50 animate-fade-in">
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Cart</div>
-                  <div className="text-xs text-slate-500">
-                    {card_product_count} items
-                  </div>
-                </div>
-
-                <div className="mt-2 divide-y">
-                  {card_products.length > 0 ? (
-                    card_products.slice(0, 4).map((p, i) => (
-                      <div
-                        key={i}
-                        className="py-2 flex items-center gap-3 transition-transform duration-300 hover:translate-x-1"
-                      >
-                        <img
-                          src={p.image || "/images/p-thumb-1.jpg"}
-                          alt={p.name}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{p.name}</div>
-                          <div className="text-xs text-slate-500">
-                            ${p.price}
-                          </div>
-                        </div>
-                        <div className="text-sm font-semibold">${p.price}</div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="py-4 text-sm text-slate-500">
-                      Your cart is empty
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => navigate("/card")}
-                    className="flex-1 bg-emerald-600 text-white py-2 rounded transition-colors duration-300 hover:bg-emerald-700"
-                  >
-                    View Cart
-                  </button>
-                  <button
-                    onClick={() => navigate("/checkout")}
-                    className="flex-1 border rounded py-2 transition-colors duration-300 hover:bg-slate-100"
-                  >
-                    Checkout
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile search icon */}
-          <div className="md:hidden">
-            <button
-              className="p-2 rounded hover:bg-slate-100 transition-colors duration-200"
-              aria-label="Open search"
-              onClick={() => setShowSearchOverlay(true)}
-            >
-              <FaSearch />
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Mobile sidebar/drawer with animation */}
       <aside
         className={`fixed top-0 left-0 w-72 h-full bg-white z-50 shadow-lg transform ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300`}
+        } transition-transform duration-300 ease-in-out`}
         aria-hidden={!showSidebar}
       >
         <div className="flex items-center justify-between p-4 border-b">
@@ -697,87 +822,72 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
           <Link
             to="/"
             onClick={() => setShowSidebar(false)}
-            className="block py-2 px-2 rounded hover:bg-emerald-50 transition-colors duration-200"
+            className="block py-3 px-3 rounded hover:bg-emerald-50 transition-colors duration-200"
           >
-            <FaHome className="inline mr-2 text-emerald-600" /> Home
+            <FaHome className="inline mr-3 text-emerald-600" /> Home
           </Link>
+
           <details className="group">
-            <summary className="py-2 px-2 rounded hover:bg-emerald-50 cursor-pointer flex items-center justify-between transition-colors duration-200">
+            <summary className="py-3 px-3 rounded hover:bg-emerald-50 cursor-pointer flex items-center justify-between transition-colors duration-200">
               <span className="flex items-center">
-                <FaList className="inline mr-2 text-emerald-600" /> Categories
+                <FaList className="inline mr-3 text-emerald-600" /> All Categories
               </span>
               <FaChevronRight className="transition-transform duration-300 group-open:rotate-90" />
             </summary>
-            <div className="pl-4 mt-2 space-y-1">
+            <div className="pl-6 mt-2 space-y-2">
               {categorys.map((c, idx) => (
                 <Link
                   key={idx}
                   to={`/products?category=${encodeURIComponent(c.name)}`}
                   onClick={() => setShowSidebar(false)}
-                  className="block py-1 text-sm text-slate-700 hover:text-emerald-600 transition-colors duration-200"
+                  className="block py-2 text-sm text-slate-700 hover:text-emerald-600 transition-colors duration-200"
                 >
                   {c.name}
                 </Link>
               ))}
             </div>
           </details>
-
           <Link
             to="/deals"
             onClick={() => setShowSidebar(false)}
-            className="block py-2 px-2 rounded hover:bg-emerald-50 transition-colors duration-200"
+            className="block py-3 px-3 rounded hover:bg-emerald-50 transition-colors duration-200"
           >
-            <FaGift className="inline mr-2 text-emerald-600" /> Deals
+            <FaGift className="inline mr-3 text-emerald-600" /> Deals
           </Link>
           <Link
             to="/orders"
             onClick={() => setShowSidebar(false)}
-            className="block py-2 px-2 rounded hover:bg-emerald-50 transition-colors duration-200"
+            className="block py-3 px-3 rounded hover:bg-emerald-50 transition-colors duration-200"
           >
-            <FaShoppingBag className="inline mr-2 text-emerald-600" /> Orders
+            <FaShoppingBag className="inline mr-3 text-emerald-600" /> Orders
           </Link>
           <Link
             to="/contact"
             onClick={() => setShowSidebar(false)}
-            className="block py-2 px-2 rounded hover:bg-emerald-50 transition-colors duration-200"
+            className="block py-3 px-3 rounded hover:bg-emerald-50 transition-colors duration-200"
           >
-            <FaPhoneAlt className="inline mr-2 text-emerald-600" /> Contact
+            <FaPhoneAlt className="inline mr-3 text-emerald-600" /> Contact
           </Link>
 
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-slate-200">
             {userInfo ? (
-              <div className="text-sm">Hello, {userInfo.name}</div>
+              <div className="text-sm py-2 px-3 text-slate-700">Hello, {userInfo.name}</div>
             ) : (
               <Link
                 to="/login"
                 onClick={() => setShowSidebar(false)}
-                className="block mt-2 py-2 px-2 bg-emerald-600 text-white rounded text-center hover:bg-emerald-700 transition-colors duration-200"
+                className="block mt-2 py-3 px-3 bg-emerald-600 text-white rounded-lg text-center hover:bg-emerald-700 transition-colors duration-200"
               >
                 <FaSignInAlt className="inline mr-2" /> Login / Register
               </Link>
             )}
           </div>
         </nav>
-
-        <div className="absolute bottom-4 left-4 text-sm text-slate-600">
-          <div className="flex items-center gap-2">
-            <FaPhoneAlt />
-            <a href="tel:+1234323343">+123 4323 343</a>
-          </div>
-          <div className="mt-2 flex gap-2">
-            <a href="#" aria-label="facebook">
-              <FaFacebookF />
-            </a>
-            <a href="#" aria-label="twitter">
-              <FaTwitter />
-            </a>
-          </div>
-        </div>
       </aside>
 
-      {/* Mobile bottom navigation with icons instead of emojis */}
-      <nav className="fixed bottom-0 left-0 right-0 md:hidden bg-white border-t z-40 shadow-lg">
-        <div className="flex justify-between items-center max-w-xl mx-auto">
+      {/* Mobile bottom navigation with icons */}
+      <nav className="fixed bottom-0 left-0 right-0 md:hidden bg-white border-t border-slate-200 z-40 shadow-lg">
+        <div className="flex justify-around items-center max-w-xl mx-auto py-1">
           <Link
             to="/"
             className="w-1/5 py-2 text-center text-sm flex flex-col items-center justify-center transition-colors duration-200 hover:text-emerald-600"
@@ -794,25 +904,30 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
             <div className="text-xs mt-1">Categories</div>
           </button>
           <button
-            onClick={() => navigate("/card")}
+            onClick={() => navigate(userInfo ? "/dashboard/my-wishlist" : "/login")}
+            className="w-1/5 py-2 text-center text-sm relative flex flex-col items-center justify-center transition-colors duration-200 hover:text-emerald-600"
+            aria-label="Wishlist"
+          >
+            <FaHeart className="text-xl" />
+            {wishlist_count > 0 && (
+              <span className="absolute top-0 right-4 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                {wishlist_count}
+              </span>
+            )}
+            <div className="text-xs mt-1">Wishlist</div>
+          </button>
+          <button
+            onClick={() => navigate(userInfo ? "/card" : "/login")}
             className="w-1/5 py-2 text-center text-sm relative flex flex-col items-center justify-center transition-colors duration-200 hover:text-emerald-600"
             aria-label="Cart"
           >
-            <FaCartPlus className="text-xl" />
+            <FaShoppingCart className="text-xl" />
             {card_product_count > 0 && (
-              <span className="absolute -top-1 right-6 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+              <span className="absolute top-0 right-4 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
                 {card_product_count}
               </span>
             )}
             <div className="text-xs mt-1">Cart</div>
-          </button>
-          <button
-            onClick={() => navigate("/dashboard/my-wishlist")}
-            className="w-1/5 py-2 text-center text-sm flex flex-col items-center justify-center transition-colors duration-200 hover:text-emerald-600"
-            aria-label="Wishlist"
-          >
-            <FaHeart className="text-xl" />
-            <div className="text-xs mt-1">Wishlist</div>
           </button>
           <button
             onClick={() => navigate(userInfo ? "/dashboard" : "/login")}
@@ -824,52 +939,6 @@ const Header = ({ logoSrc = "/images/logo.png" }) => {
           </button>
         </div>
       </nav>
-
-      {/* Search overlay for mobile */}
-      {showSearchOverlay && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-start p-4 md:hidden transition-opacity duration-300 animate-fade-in">
-          <div className="w-full bg-white rounded shadow-lg p-3">
-            <div className="flex items-center gap-2">
-              <input
-                autoFocus
-                type="text"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="flex-1 px-3 py-2 border rounded focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-200"
-                placeholder="Search products..."
-                aria-label="mobile search"
-              />
-              <button
-                onClick={handleSearchSubmit}
-                className="bg-emerald-600 text-white px-4 py-2 rounded transition-colors duration-200 hover:bg-emerald-700"
-              >
-                Search
-              </button>
-              <button
-                onClick={() => setShowSearchOverlay(false)}
-                className="p-2 text-xl hover:text-red-600 transition-colors duration-200"
-                aria-label="Close search"
-              >
-                <FaTimes />
-              </button>
-            </div>
-
-            {searchSuggestions.length > 0 && (
-              <ul className="mt-2 animate-slide-down">
-                {searchSuggestions.map((s, i) => (
-                  <li
-                    key={i}
-                    onClick={() => handleSuggestionClick(s)}
-                    className="py-2 border-b cursor-pointer hover:bg-slate-50 transition-colors duration-200"
-                  >
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 };
