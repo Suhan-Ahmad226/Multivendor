@@ -6,13 +6,13 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'xl': {'max': '1200px'},
-        'lg': {'max': '1080px'},
-        'md-lg': {'max': '991px'},
-        'md': {'max': '768px'},
-        'sm': {'max': '576px'},
-        'xs': {'max': '480px'},
-        '2xs': {'max': '340px'},
+        'xl': '1200px',
+        'lg': '1080px',
+        'md-lg': '991px',
+        'md': '768px',
+        'sm': '576px',
+        'xs': '480px',
+        '2xs': '340px',
       },
       keyframes: {
         "fade-in": {
