@@ -8,7 +8,7 @@ import { AiOutlineStar } from "react-icons/ai";
 
 const Products = ({ title, products }) => {
     
-    // Carousel-এর জন্য রেসপন্সিভ ব্রেকপয়েন্ট। সব ডিভাইসেই ১টি করে স্লাইড দেখাবে,
+    // Carousel-এর জন্য রেসপন্সিভ ব্রেকপয়েন্ট। সব ডিভাইসেই ১টি করে স্লাইড দেখাবে
     // কিন্তু প্রতিটি স্লাইডের ভেতরে আমরা গ্রিড ব্যবহার করে একাধিক প্রোডাক্ট দেখাবো।
     const responsive = {
         superLargeDesktop: { breakpoint: { max: 4000, min: 3000 }, items: 1 },
