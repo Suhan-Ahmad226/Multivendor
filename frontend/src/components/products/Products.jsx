@@ -32,34 +32,41 @@ const Products = ({ title, products }) => {
     },
   };
 
-  // Custom Buttons
-  const ButtonGroup = ({ next, previous }) => {
-    return (
-      <div className="flex justify-between items-center mb-6 px-2">
-        {/* Section Title */}
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-700 relative">
-          {title}
-          <span className="block w-20 h-[3px] bg-[#059473] mt-2 animate-pulse"></span>
-        </h2>
+  // Custom Buttons (must be function, not JSX)
+  const ButtonGroup = ({ next, previous }) => (
+    <div className="flex justify-between items-center mb-6 px-2">
+      {/* Section Title */}
+      <h2 className="text-2xl md:text-3xl font-bold text-slate-700 relative">
+        {title}
+        <span className="block w-20 h-[3px] bg-[#059473] mt-2 animate-pulse"></span>
+      </h2>
 
-        {/* Navigation Arrows */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => previous()}
-            className="w-10 h-10 flex justify-center items-center bg-gray-200 rounded-full hover:bg-[#059473] hover:text-white transition-all shadow"
-          >
-            <IoIosArrowBack size={20} />
-          </button>
-          <button
-            onClick={() => next()}
-            className="w-10 h-10 flex justify-center items-center bg-gray-200 rounded-full hover:bg-[#059473] hover:text-white transition-all shadow"
-          >
-            <IoIosArrowForward size={20} />
-          </button>
-        </div>
+      {/* Navigation Arrows */}
+      <div className="flex gap-3">
+        <button
+          onClick={previous}
+          className="w-10 h-10 flex justify-center items-center bg-gray-200 rounded-full hover:bg-[#059473] hover:text-white transition-all shadow"
+        >
+          <IoIosArrowBack size={20} />
+        </button>
+        <button
+          onClick={next}
+          className="w-10 h-10 flex justify-center items-center bg-gray-200 rounded-full hover:bg-[#059473] hover:text-white transition-all shadow"
+        >
+          <IoIosArrowForward size={20} />
+        </button>
+      </div>
+    </div>
+  );
+
+  // products ফাঁকা/undefined হলে fallback দেখানো
+  if (!products || !Array.isArray(products) || products.length === 0) {
+    return (
+      <div className="w-[90%] lg:w-[85%] mx-auto py-10 text-center text-xl text-gray-400">
+        কোন পণ্য পাওয়া যায়নি।
       </div>
     );
-  };
+  }
 
   return (
     <div className="w-[90%] lg:w-[85%] mx-auto py-10">
@@ -71,12 +78,12 @@ const Products = ({ title, products }) => {
         responsive={responsive}
         transitionDuration={600}
         renderButtonGroupOutside={true}
-        customButtonGroup={<ButtonGroup />}
+        customButtonGroup={ButtonGroup}
         containerClass="pb-6"
       >
         {products.map((pl, i) => (
           <div
-            key={i}
+            key={pl._id || i}
             className="group border rounded-lg p-4 bg-white hover:shadow-lg transition-all duration-500 relative"
           >
             {/* Product Image */}
@@ -88,8 +95,8 @@ const Products = ({ title, products }) => {
               )}
               <img
                 className="w-full h-[220px] object-cover rounded-md transform transition-transform duration-500 group-hover:scale-105"
-                src={pl.images[0]}
-                alt={pl.name}
+                src={pl.images && pl.images[0] ? pl.images[0] : 'https://via.placeholder.com/220x220?text=No+Image'}
+                alt={pl.name || 'Product'}
               />
 
               {/* Hover Buttons */}
@@ -112,10 +119,10 @@ const Products = ({ title, products }) => {
             {/* Product Info */}
             <div className="mt-4 text-center">
               <h3 className="font-semibold text-slate-700 text-sm md:text-base truncate hover:text-[#059473] transition">
-                {pl.name}
+                {pl.name || 'Unnamed Product'}
               </h3>
               <span className="text-lg font-bold text-[#059473] block mt-1">
-                ${pl.price}
+                {pl.price ? `$${pl.price}` : 'Price N/A'}
               </span>
             </div>
           </div>
