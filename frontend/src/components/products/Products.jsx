@@ -3,6 +3,9 @@ import Carousel from 'react-multi-carousel';
 import { Link } from 'react-router-dom';
 import 'react-multi-carousel/lib/styles.css';
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { FaRegHeart } from "react-icons/fa";
+import { RiShoppingCartLine } from "react-icons/ri";
+import { FaEye } from "react-icons/fa6";
 
 const Products = ({ title, products }) => {
   // Responsive breakpoints
@@ -36,7 +39,7 @@ const Products = ({ title, products }) => {
         {/* Section Title */}
         <h2 className="text-2xl md:text-3xl font-bold text-slate-700 relative">
           {title}
-          <span className="block w-16 h-[3px] bg-[#059473] mt-2 animate-pulse"></span>
+          <span className="block w-20 h-[3px] bg-[#059473] mt-2 animate-pulse"></span>
         </h2>
 
         {/* Navigation Arrows */}
@@ -61,48 +64,60 @@ const Products = ({ title, products }) => {
   return (
     <div className="w-[90%] lg:w-[85%] mx-auto py-10">
       <Carousel
-        autoPlay={false}
-        infinite={false}
+        autoPlay={true}
+        autoPlaySpeed={4000}
+        infinite={true}
         arrows={false}
         responsive={responsive}
-        transitionDuration={500}
+        transitionDuration={600}
         renderButtonGroupOutside={true}
         customButtonGroup={<ButtonGroup />}
         containerClass="pb-6"
       >
-        {products.map((group, i) => (
-          <div key={i} className="flex flex-col gap-4">
-            {group.map((pl, j) => (
-              <Link
-                key={j}
-                to={`/product/details/${pl.slug}`}
-                className="flex items-center gap-3 border rounded-lg p-3 bg-white hover:shadow-md transition-all duration-500 hover:-translate-y-1"
-              >
-                {/* Product Image */}
-                <div className="relative overflow-hidden rounded-md">
-                  <img
-                    className="w-[100px] h-[100px] object-cover rounded-md transform transition-transform duration-500 hover:scale-110"
-                    src={pl.images[0]}
-                    alt={pl.name}
-                  />
-                  {pl.discount && (
-                    <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-[2px] rounded-full shadow">
-                      -{pl.discount}%
-                    </span>
-                  )}
-                </div>
+        {products.map((pl, i) => (
+          <div
+            key={i}
+            className="group border rounded-lg p-4 bg-white hover:shadow-lg transition-all duration-500 relative"
+          >
+            {/* Product Image */}
+            <div className="relative overflow-hidden rounded-md">
+              {pl.discount && (
+                <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-[2px] rounded-full shadow">
+                  -{pl.discount}%
+                </span>
+              )}
+              <img
+                className="w-full h-[220px] object-cover rounded-md transform transition-transform duration-500 group-hover:scale-105"
+                src={pl.images[0]}
+                alt={pl.name}
+              />
 
-                {/* Product Info */}
-                <div className="flex flex-col justify-between">
-                  <h3 className="font-semibold text-slate-700 truncate hover:text-[#059473] transition">
-                    {pl.name}
-                  </h3>
-                  <span className="text-lg font-bold text-[#059473]">
-                    ${pl.price}
-                  </span>
-                </div>
-              </Link>
-            ))}
+              {/* Hover Buttons */}
+              <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex justify-center items-center gap-3 transition-all duration-500">
+                <button className="w-10 h-10 bg-white rounded-full flex justify-center items-center hover:bg-[#059473] hover:text-white transition-all">
+                  <FaRegHeart />
+                </button>
+                <Link
+                  to={`/product/details/${pl.slug}`}
+                  className="w-10 h-10 bg-white rounded-full flex justify-center items-center hover:bg-[#059473] hover:text-white transition-all"
+                >
+                  <FaEye />
+                </Link>
+                <button className="w-10 h-10 bg-white rounded-full flex justify-center items-center hover:bg-[#059473] hover:text-white transition-all">
+                  <RiShoppingCartLine />
+                </button>
+              </div>
+            </div>
+
+            {/* Product Info */}
+            <div className="mt-4 text-center">
+              <h3 className="font-semibold text-slate-700 text-sm md:text-base truncate hover:text-[#059473] transition">
+                {pl.name}
+              </h3>
+              <span className="text-lg font-bold text-[#059473] block mt-1">
+                ${pl.price}
+              </span>
+            </div>
           </div>
         ))}
       </Carousel>
