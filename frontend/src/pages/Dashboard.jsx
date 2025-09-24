@@ -1,103 +1,110 @@
+// src/pages/Dashboard.jsx
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { FaList } from 'react-icons/fa';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { IoIosHome } from "react-icons/io";
-import { FaBorderAll } from "react-icons/fa6";
-import { FaHeart } from "react-icons/fa";
-import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
-import { IoMdLogOut } from "react-icons/io";
-import { RiLockPasswordLine } from "react-icons/ri";
+import { FaList } from 'react-icons/fa';
+import { IoIosHome } from 'react-icons/io';
+import { FaBorderAll } from 'react-icons/fa6';
+import { FaHeart } from 'react-icons/fa';
+import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
+import { IoMdLogOut } from 'react-icons/io';
+import { RiLockPasswordLine } from 'react-icons/ri';
 import api from '../api/api';
 import { useDispatch } from 'react-redux';
-import { user_reset } from '../store/reducers/authReducer'
-import { reset_count } from '../store/reducers/cardReducer'
-
+import { user_reset } from '../store/reducers/authReducer';
+import { reset_count } from '../store/reducers/cardReducer';
 
 const Dashboard = () => {
-    const [filterShow, setFilterShow] =  useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-
-    const logout = async () => {
-        try {
-            const {data} = await api.get('/customer/logout')
-            localStorage.removeItem('customerToken')
-            dispatch(user_reset())
-            dispatch(reset_count())
-            navigate('/login')
-            
-        } catch (error) {
-            console.log(error.response.data)
-        }
+  const logout = async () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      try {
+        await api.get('/customer/logout');
+        localStorage.removeItem('customerToken');
+        dispatch(user_reset());
+        dispatch(reset_count());
+        navigate('/login');
+      } catch (error) {
+        console.log(error.response?.data);
+      }
     }
+  };
 
-    return (
-        <div>
-           <Header/>
-           <div className='bg-slate-200 mt-5'>
-                <div className='w-[90%] mx-auto md-lg:block hidden'>
-                    <div>
-                        <button onClick={() => setFilterShow(!filterShow)} className='text-center py-3 px-3 bg-green-500 text-white'><FaList/> </button>
-                    </div> 
-                </div>
+  const sidebarLinks = [
+    { icon: <IoIosHome />, label: 'Dashboard', path: '/dashboard' },
+    { icon: <FaBorderAll />, label: 'My Orders', path: '/dashboard/my-orders' },
+    { icon: <FaHeart />, label: 'Wishlist', path: '/dashboard/my-wishlist' },
+    { icon: <IoChatbubbleEllipsesSharp />, label: 'Chat', path: '/dashboard/chat' },
+    { icon: <RiLockPasswordLine />, label: 'Change Password', path: '/dashboard/change-password' },
+    { icon: <IoMdLogOut />, label: 'Logout', action: logout },
+  ];
 
-        <div className='h-full mx-auto'>
-            <div className='py-5 flex md-lg:w-[90%] mx-auto relative'>
-                <div className={`rounded-md z-50 md-lg:absolute ${filterShow ? '-left-4' : '-left-[360px]'} w-[270px] ml-4 bg-white`}>
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <Header />
 
-            <ul className='py-2 text-slate-600 px-4'> 
-                
-                <li className='flex justify-start items-center gap-2 py-2'>
-            <span className='text-xl'><IoIosHome /></span>
-            <Link to='/dashboard' className='block' >Dashboard </Link>
-                </li>
-                <li className='flex justify-start items-center gap-2 py-2'>
-            <span className='text-xl'><FaBorderAll/></span>
-            <Link to='/dashboard/my-orders' className='block' >My Orders </Link>
-                </li>
-                <li className='flex justify-start items-center gap-2 py-2'>
-            <span className='text-xl'><FaHeart/></span>
-            <Link to='/dashboard/my-wishlist' className='block' >Wishlist </Link>
-                </li>
-                <li className='flex justify-start items-center gap-2 py-2'>
-            <span className='text-xl'><IoChatbubbleEllipsesSharp/></span>
-            <Link to='/dashboard/chat' className='block' >Chat  </Link>
-                </li>
-                <li className='flex justify-start items-center gap-2 py-2'>
-            <span className='text-xl'><RiLockPasswordLine/></span>
-            <Link to='/dashboard/change-password' className='block' >Change Password  </Link>
-                </li>
-                <li onClick={logout} className='flex justify-start items-center gap-2 py-2 cursor-pointer'>
-            <span className='text-xl'><IoMdLogOut/></span>
-            <div  className='block' >Logout </div>
-                </li> 
+      <div className="flex flex-1 relative">
+        {/* Sidebar */}
+        <aside
+          className={`fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static w-64 md:w-64`}
+        >
+          <div className="p-5 flex justify-between items-center border-b">
+            <h2 className="font-bold text-lg text-gray-700">Menu</h2>
+            <button className="md:hidden text-2xl font-bold" onClick={() => setSidebarOpen(false)}>
+              ×
+            </button>
+          </div>
 
-            </ul> 
-                </div>
+          <ul className="mt-4">
+            {sidebarLinks.map((link, idx) => (
+              <li key={idx} className="hover:bg-green-50 transition rounded-md">
+                {link.path ? (
+                  <Link
+                    to={link.path}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-green-600"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <span className="text-xl">{link.icon}</span>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <button
+                    onClick={link.action}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600"
+                  >
+                    <span className="text-xl">{link.icon}</span>
+                    {link.label}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-
-                <div className='w-[calc(100%-270px)] md-lg:w-full'>
-                    <div className='mx-4 md-lg:mx-0'>
-                        <Outlet/>
-                    </div>
-                </div>
-                
-            </div>
-        </div>        
-
-
-
-
-
-
-           </div>
-
-           <Footer/>
+        {/* Mobile toggle button */}
+        <div className="md:hidden fixed top-5 left-5 z-40">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="bg-green-500 text-white p-3 rounded-md shadow flex items-center justify-center hover:bg-green-600 transition"
+          >
+            <FaList />
+          </button>
         </div>
-    );
+
+        {/* Main content */}
+        <main className="flex-1 md:ml-64 transition-all duration-300 p-5">
+          <Outlet />
+        </main>
+      </div>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default Dashboard;
