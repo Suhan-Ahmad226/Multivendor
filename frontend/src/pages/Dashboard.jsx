@@ -9,6 +9,7 @@ import { FaHeart } from "react-icons/fa";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -17,7 +18,9 @@ import { user_reset } from '../store/reducers/authReducer';
 import { reset_count } from '../store/reducers/cardReducer';
 
 const Dashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile open
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Desktop collapse
+  const [hovered, setHovered] = useState(false); // Hover expand
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -42,6 +45,12 @@ const Dashboard = () => {
     { icon: <IoMdLogOut />, label: 'Logout', action: logout },
   ];
 
+  // Determine sidebar width
+  const getSidebarWidth = () => {
+    if (sidebarCollapsed && !hovered) return '20'; // mini mode
+    if (!sidebarCollapsed || hovered) return '64'; // expanded
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 overflow-x-hidden">
       <Header />
@@ -49,39 +58,54 @@ const Dashboard = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside
-          className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-            md:translate-x-0 md:static
+          className={`fixed top-0 left-0 h-full bg-white shadow-xl z-50 transform transition-all duration-300
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            w-${getSidebarWidth()} md:translate-x-0 md:static
           `}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
           <div className="flex justify-between items-center p-5 border-b">
-            <h2 className="text-lg font-bold text-gray-700">Menu</h2>
-            <button
-              className="md:hidden text-2xl font-bold text-gray-600 hover:text-red-500 transition"
-              onClick={() => setSidebarOpen(false)}
-            >
-              ×
-            </button>
+            {!sidebarCollapsed || hovered ? (
+              <h2 className="text-lg font-bold text-gray-700">Menu</h2>
+            ) : null}
+            <div className="flex items-center gap-2">
+              <button
+                className="hidden md:flex text-gray-600 hover:text-green-600 transition"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              >
+                {sidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
+              </button>
+              <button
+                className="md:hidden text-2xl font-bold text-gray-600 hover:text-red-500 transition"
+                onClick={() => setSidebarOpen(false)}
+              >
+                ×
+              </button>
+            </div>
           </div>
+
           <ul className="mt-4 text-gray-700">
             {sidebarLinks.map((link, idx) => (
               <li key={idx} className="hover:bg-green-50 transition rounded-md">
                 {link.path ? (
                   <Link
                     to={link.path}
-                    className="flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium transition"
+                    className={`flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium transition
+                      ${sidebarCollapsed && !hovered ? 'justify-center' : ''}`}
                     onClick={() => setSidebarOpen(false)}
                   >
                     <span className="text-xl">{link.icon}</span>
-                    {link.label}
+                    {(!sidebarCollapsed || hovered) && link.label}
                   </Link>
                 ) : (
                   <button
                     onClick={link.action}
-                    className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600 transition"
+                    className={`flex items-center w-full gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600 transition
+                      ${sidebarCollapsed && !hovered ? 'justify-center' : ''}`}
                   >
                     <span className="text-xl">{link.icon}</span>
-                    {link.label}
+                    {(!sidebarCollapsed || hovered) && link.label}
                   </button>
                 )}
               </li>
@@ -108,7 +132,11 @@ const Dashboard = () => {
         )}
 
         {/* Main content */}
-        <main className="flex-1 transition-all duration-300 p-5 md:ml-64 w-full">
+        <main
+          className={`flex-1 transition-all duration-300 p-5
+            md:ml-${getSidebarWidth()} w-full
+          `}
+        >
           <Outlet />
         </main>
       </div>
