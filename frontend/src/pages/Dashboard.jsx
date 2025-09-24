@@ -43,20 +43,23 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 overflow-x-hidden">
       <Header />
 
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside
-          className={`fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300
+          className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-            md:translate-x-0 md:static w-64
+            md:translate-x-0 md:static
           `}
         >
           <div className="flex justify-between items-center p-5 border-b">
             <h2 className="text-lg font-bold text-gray-700">Menu</h2>
-            <button className="md:hidden text-2xl font-bold" onClick={() => setSidebarOpen(false)}>
+            <button
+              className="md:hidden text-2xl font-bold text-gray-600 hover:text-red-500 transition"
+              onClick={() => setSidebarOpen(false)}
+            >
               ×
             </button>
           </div>
@@ -66,7 +69,7 @@ const Dashboard = () => {
                 {link.path ? (
                   <Link
                     to={link.path}
-                    className="flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium"
+                    className="flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium transition"
                     onClick={() => setSidebarOpen(false)}
                   >
                     <span className="text-xl">{link.icon}</span>
@@ -75,7 +78,7 @@ const Dashboard = () => {
                 ) : (
                   <button
                     onClick={link.action}
-                    className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600"
+                    className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600 transition"
                   >
                     <span className="text-xl">{link.icon}</span>
                     {link.label}
@@ -90,14 +93,22 @@ const Dashboard = () => {
         <div className="md:hidden fixed top-5 left-5 z-40">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="bg-green-500 text-white p-3 rounded-md shadow flex items-center justify-center"
+            className="bg-green-500 text-white p-3 rounded-md shadow-lg flex items-center justify-center hover:bg-green-600 transition"
           >
             <FaList />
           </button>
         </div>
 
+        {/* Overlay for mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Main content */}
-        <main className="flex-1 transition-all duration-300 p-5 md:ml-64">
+        <main className="flex-1 transition-all duration-300 p-5 md:ml-64 w-full">
           <Outlet />
         </main>
       </div>
