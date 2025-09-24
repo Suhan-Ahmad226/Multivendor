@@ -1,20 +1,21 @@
-// src/components/Dashboard.jsx
+// src/pages/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import Header from './Header';
-import Footer from './Footer';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-hot-toast';
 import { FaList, FaHeart, FaShoppingCart } from 'react-icons/fa';
 import { IoIosHome } from "react-icons/io";
 import { FaBorderAll } from "react-icons/fa6";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import api from '../api/api';
-import { useDispatch, useSelector } from 'react-redux';
 import { user_reset } from '../store/reducers/authReducer';
 import { reset_count } from '../store/reducers/cardReducer';
-import { toast } from 'react-hot-toast';
-import { get_dashboard_index_data } from '../store/reducers/dashboardReducer'; // ✅ src এর ভিতর থেকে import
+import { get_dashboard_index_data } from '../store/reducers/dashboardReducer';
 
 const Dashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,7 +25,9 @@ const Dashboard = () => {
     const { recentOrders, totalOrder, pendingOrder, cancelledOrder } = useSelector(state => state.dashboard);
 
     useEffect(() => {
-        if(userInfo?.id) dispatch(get_dashboard_index_data(userInfo.id));
+        if(userInfo?.id) {
+            dispatch(get_dashboard_index_data(userInfo.id));
+        }
     }, [userInfo]);
 
     const logout = async () => {
@@ -53,8 +56,13 @@ const Dashboard = () => {
     ];
 
     const redirectToPayment = (ord) => {
-        let items = ord.products.reduce((acc, p) => acc + p.quantity, 0);
-        navigate('/payment', { state: { price: ord.price, items, orderId: ord._id } });
+        let items = 0;
+        for (let i = 0; i < ord.products.length; i++) {
+            items += ord.products[i].quantity;
+        }
+        navigate('/payment', {
+            state: { price: ord.price, items, orderId: ord._id }
+        });
     };
 
     return (
@@ -118,7 +126,7 @@ const Dashboard = () => {
                                 <FaShoppingCart />
                             </div>
                             <div className="ml-3">
-                                <h2 className="text-2xl font-bold">{totalOrder}</h2>
+                                <h2 className="text-2xl font-bold">{totalOrder || 0}</h2>
                                 <p className="text-gray-500">Total Orders</p>
                             </div>
                         </div>
@@ -128,7 +136,7 @@ const Dashboard = () => {
                                 <FaShoppingCart />
                             </div>
                             <div className="ml-3">
-                                <h2 className="text-2xl font-bold">{pendingOrder}</h2>
+                                <h2 className="text-2xl font-bold">{pendingOrder || 0}</h2>
                                 <p className="text-gray-500">Pending Orders</p>
                             </div>
                         </div>
@@ -138,7 +146,7 @@ const Dashboard = () => {
                                 <FaShoppingCart />
                             </div>
                             <div className="ml-3">
-                                <h2 className="text-2xl font-bold">{cancelledOrder}</h2>
+                                <h2 className="text-2xl font-bold">{cancelledOrder || 0}</h2>
                                 <p className="text-gray-500">Cancelled Orders</p>
                             </div>
                         </div>
@@ -148,7 +156,7 @@ const Dashboard = () => {
                                 <FaHeart />
                             </div>
                             <div className="ml-3">
-                                <h2 className="text-2xl font-bold">{recentOrders.length}</h2>
+                                <h2 className="text-2xl font-bold">{recentOrders?.length || 0}</h2>
                                 <p className="text-gray-500">Recent Orders</p>
                             </div>
                         </div>
@@ -169,7 +177,7 @@ const Dashboard = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {recentOrders.map((ord, i) => (
+                                    {recentOrders?.map((ord, i) => (
                                         <tr key={i} className="border-b hover:bg-gray-50 transition">
                                             <td className="px-4 py-2 font-medium">#{ord._id}</td>
                                             <td className="px-4 py-2">${ord.price}</td>
