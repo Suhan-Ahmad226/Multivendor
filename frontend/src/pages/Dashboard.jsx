@@ -1,17 +1,18 @@
 // src/pages/Dashboard.jsx
 import React, { useState } from 'react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { FaList } from 'react-icons/fa';
+import { IoIosHome } from "react-icons/io";
+import { FaBorderAll } from "react-icons/fa6";
+import { FaHeart } from "react-icons/fa";
+import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
+import { IoMdLogOut } from "react-icons/io";
+import { RiLockPasswordLine } from "react-icons/ri";
+
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { FaList } from 'react-icons/fa';
-import { IoIosHome } from 'react-icons/io';
-import { FaBorderAll } from 'react-icons/fa6';
-import { FaHeart } from 'react-icons/fa';
-import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
-import { IoMdLogOut } from 'react-icons/io';
-import { RiLockPasswordLine } from 'react-icons/ri';
 import api from '../api/api';
-import { useDispatch } from 'react-redux';
 import { user_reset } from '../store/reducers/authReducer';
 import { reset_count } from '../store/reducers/cardReducer';
 
@@ -21,16 +22,14 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const logout = async () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      try {
-        await api.get('/customer/logout');
-        localStorage.removeItem('customerToken');
-        dispatch(user_reset());
-        dispatch(reset_count());
-        navigate('/login');
-      } catch (error) {
-        console.log(error.response?.data);
-      }
+    try {
+      await api.get('/customer/logout');
+      localStorage.removeItem('customerToken');
+      dispatch(user_reset());
+      dispatch(reset_count());
+      navigate('/login');
+    } catch (error) {
+      console.log(error.response?.data);
     }
   };
 
@@ -47,26 +46,27 @@ const Dashboard = () => {
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
 
-      <div className="flex flex-1 relative">
+      <div className="flex flex-1">
         {/* Sidebar */}
         <aside
           className={`fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static w-64 md:w-64`}
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+            md:translate-x-0 md:static w-64
+          `}
         >
-          <div className="p-5 flex justify-between items-center border-b">
-            <h2 className="font-bold text-lg text-gray-700">Menu</h2>
+          <div className="flex justify-between items-center p-5 border-b">
+            <h2 className="text-lg font-bold text-gray-700">Menu</h2>
             <button className="md:hidden text-2xl font-bold" onClick={() => setSidebarOpen(false)}>
               ×
             </button>
           </div>
-
-          <ul className="mt-4">
+          <ul className="mt-4 text-gray-700">
             {sidebarLinks.map((link, idx) => (
               <li key={idx} className="hover:bg-green-50 transition rounded-md">
                 {link.path ? (
                   <Link
                     to={link.path}
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-green-600"
+                    className="flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium"
                     onClick={() => setSidebarOpen(false)}
                   >
                     <span className="text-xl">{link.icon}</span>
@@ -75,7 +75,7 @@ const Dashboard = () => {
                 ) : (
                   <button
                     onClick={link.action}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600"
+                    className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600"
                   >
                     <span className="text-xl">{link.icon}</span>
                     {link.label}
@@ -90,14 +90,14 @@ const Dashboard = () => {
         <div className="md:hidden fixed top-5 left-5 z-40">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="bg-green-500 text-white p-3 rounded-md shadow flex items-center justify-center hover:bg-green-600 transition"
+            className="bg-green-500 text-white p-3 rounded-md shadow flex items-center justify-center"
           >
             <FaList />
           </button>
         </div>
 
         {/* Main content */}
-        <main className="flex-1 md:ml-64 transition-all duration-300 p-5">
+        <main className="flex-1 transition-all duration-300 p-5 md:ml-64">
           <Outlet />
         </main>
       </div>
