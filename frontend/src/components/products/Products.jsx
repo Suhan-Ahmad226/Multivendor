@@ -1,38 +1,47 @@
 import React from 'react';
 import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
 import { Link } from 'react-router-dom';
+import 'react-multi-carousel/lib/styles.css';
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
-import { AiOutlineStar } from "react-icons/ai";
+import { FaStar } from "react-icons/fa"; // রেটিং এর জন্য স্টার আইকন
 
 const Products = ({ title, products }) => {
-    
-    // Carousel-এর জন্য রেসপন্সিভ ব্রেকপয়েন্ট। সব ডিভাইসেই ১টি করে স্লাইড দেখাবে
-    // কিন্তু প্রতিটি স্লাইডের ভেতরে আমরা গ্রিড ব্যবহার করে একাধিক প্রোডাক্ট দেখাবো।
+
+    // বিভিন্ন স্ক্রিনের জন্য কতগুলো আইটেম দেখা যাবে তা নির্ধারণ করা হয়েছে
     const responsive = {
-        superLargeDesktop: { breakpoint: { max: 4000, min: 3000 }, items: 1 },
-        desktop: { breakpoint: { max: 3000, min: 1024 }, items: 1 },
-        tablet: { breakpoint: { max: 1024, min: 464 }, items: 1 },
-        mobile: { breakpoint: { max: 464, min: 0 }, items: 1 },
+        superLargeDesktop: {
+            breakpoint: { max: 4000, min: 2000 },
+            items: 6
+        },
+        desktop: {
+            breakpoint: { max: 2000, min: 1024 },
+            items: 5
+        },
+        tablet: {
+            breakpoint: { max: 1024, min: 768 },
+            items: 3
+        },
+        // medium tablet
+        mdtablet: {
+            breakpoint: { max: 768, min: 464 },
+            items: 2
+        },
+        mobile: {
+            breakpoint: { max: 464, min: 0 },
+            items: 1
+        },
     };
 
-    // ক্যারোসেলের নেভিগেশন বাটনগুলোর নতুন ডিজাইন
+    // ক্যারোসেল নেভিগেশন বাটনের ডিজাইন
     const ButtonGroup = ({ next, previous }) => {
         return (
-            <div className='flex justify-between items-center w-full px-1 md:px-3'>
+            <div className='flex justify-between items-center mb-4'>
                 <h2 className='text-2xl font-bold text-slate-800'>{title}</h2>
-                <div className='flex gap-2'>
-                    <button 
-                        onClick={() => previous()} 
-                        className='w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-full transition-all duration-300'
-                    >
+                <div className='flex justify-center items-center gap-2'>
+                    <button onClick={() => previous()} className='w-9 h-9 flex justify-center items-center bg-white text-slate-800 border border-slate-300 rounded-full hover:bg-slate-200 transition-all duration-300'>
                         <IoIosArrowBack size={20} />
                     </button>
-                    <button 
-                        onClick={() => next()} 
-                        className='w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-full transition-all duration-300'
-                    >
+                    <button onClick={() => next()} className='w-9 h-9 flex justify-center items-center bg-white text-slate-800 border border-slate-300 rounded-full hover:bg-slate-200 transition-all duration-300'>
                         <IoIosArrowForward size={20} />
                     </button>
                 </div>
@@ -40,23 +49,8 @@ const Products = ({ title, products }) => {
         );
     };
 
-    // রেটিং দেখানোর জন্য একটি ছোট ফাংশন
-    const renderRating = (rating) => {
-        const stars = [];
-        for (let i = 1; i <= 5; i++) {
-            if (i <= Math.floor(rating)) {
-                stars.push(<FaStar key={i} className="text-yellow-500" />);
-            } else if (i === Math.ceil(rating) && !Number.isInteger(rating)) {
-                stars.push(<FaStarHalfAlt key={i} className="text-yellow-500" />);
-            } else {
-                stars.push(<AiOutlineStar key={i} className="text-slate-400" />);
-            }
-        }
-        return <div className="flex items-center gap-1">{stars}</div>;
-    };
-
     return (
-        <div className='w-full mx-auto p-4 md:p-6 bg-white rounded-lg shadow-md'>
+        <div className='w-full p-4 bg-white rounded-lg shadow-md'>
             <Carousel
                 autoPlay={false}
                 infinite={false}
@@ -65,50 +59,49 @@ const Products = ({ title, products }) => {
                 transitionDuration={500}
                 renderButtonGroupOutside={true}
                 customButtonGroup={<ButtonGroup />}
+                itemClass="px-2" // প্রতিটি আইটেমের মধ্যে একটু ফাঁকা জায়গা
             >
-                {/* products array-এর প্রতিটি এলিমেন্ট একটি স্লাইড হিসেবে কাজ করবে */}
-                {products.map((slideProducts, i) => (
-                    <div key={i} className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pt-6'>
-                        {/* প্রতিটি স্লাইডের ভেতরে থাকা প্রোডাক্টগুলোকে গ্রিডে দেখানো হচ্ছে */}
-                        {slideProducts.map((product, j) => (
-                            <Link key={j} to={`/product/details/${product.slug}`} className='block group'>
-                                <div className='bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col'>
-                                    {/* Product Image */}
-                                    <div className='relative w-full h-40 md:h-48'>
-                                        <img className='w-full h-full object-cover' src={product.images[0]} alt={product.name} />
-                                        {product.discount > 0 && (
-                                            <div className='absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
-                                                {product.discount}% OFF
-                                            </div>
+                {
+                    // এখন products একটি সাধারণ array হিসেবে কাজ করবে
+                    products.map((p, i) => (
+                        <Link key={i} to={`/product/details/${p.slug}`} className='block group'>
+                            <div className='w-full h-full border border-slate-200 rounded-lg p-3 transition-all duration-300 ease-in-out group-hover:shadow-xl group-hover:border-transparent'>
+                                <div className='relative overflow-hidden'>
+                                    <img className='w-full h-[180px] object-cover rounded-lg transition-transform duration-500 ease-in-out group-hover:scale-110' src={p.images[0]} alt={p.name} />
+                                    {/* ডিসকাউন্ট ট্যাগ */}
+                                    {p.discount > 0 && (
+                                        <span className='absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full'>
+                                            {p.discount}% OFF
+                                        </span>
+                                    )}
+                                </div>
+                                <div className='py-3 flex flex-col gap-1'>
+                                    {/* প্রোডাক্টের নাম */}
+                                    <h3 className='text-md font-semibold text-slate-700 truncate'>{p.name}</h3>
+                                    {/* দাম ও ডিসকাউন্ট */}
+                                    <div className='flex items-center gap-2'>
+                                        <span className='text-lg font-bold text-slate-800'>${(p.price - (p.price * p.discount / 100)).toFixed(2)}</span>
+                                        {p.discount > 0 && (
+                                            <span className='text-sm text-slate-500 line-through'>${p.price}</span>
                                         )}
                                     </div>
-                                    {/* Product Details */}
-                                    <div className='p-3 flex flex-col flex-grow'>
-                                        <h3 className='text-sm md:text-base font-semibold text-slate-700 truncate group-hover:text-blue-600 transition-colors'>
-                                            {product.name}
-                                        </h3>
-                                        <div className='flex items-center gap-2 mt-2'>
-                                            {renderRating(product.rating || 0)}
-                                            <span className='text-xs text-slate-500'>({product.reviews || 0})</span>
-                                        </div>
-                                        <div className='mt-auto pt-2'>
-                                            <span className='text-base md:text-lg font-bold text-slate-800'>${product.price}</span>
-                                            {product.discount > 0 && (
-                                                <span className='text-sm text-slate-400 line-through ml-2'>
-                                                    ${(product.price / (1 - product.discount / 100)).toFixed(2)}
-                                                </span>
-                                            )}
-                                        </div>
+                                    {/* রেটিং */}
+                                    <div className='flex items-center gap-1 text-orange-500'>
+                                        <FaStar />
+                                        <FaStar />
+                                        <FaStar />
+                                        <FaStar />
+                                        <FaStar />
+                                        <span className='text-xs text-slate-500 ml-1'>({p.rating || 0})</span>
                                     </div>
                                 </div>
-                            </Link>
-                        ))}
-                    </div>
-                ))}
+                            </div>
+                        </Link>
+                    ))
+                }
             </Carousel>
         </div>
     );
 };
 
 export default Products;
-
