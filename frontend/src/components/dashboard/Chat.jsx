@@ -6,84 +6,121 @@ import { IoSend } from 'react-icons/io5';
 import { FaList, FaPhoneAlt, FaInfoCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { add_friend, messageClear, send_message, updateMessage } from '../../store/reducers/chatReducer';
+import {
+  add_friend,
+  messageClear,
+  send_message,
+  updateMessage
+} from '../../store/reducers/chatReducer';
 import toast from 'react-hot-toast';
 import io from 'socket.io-client';
-import Picker from 'emoji-picker-react'; // npm install emoji-picker-react
+import Picker from 'emoji-picker-react';
 
-const socket = io('http://localhost:5000');
+const socket = io('https://multivendor-vp55.onrender.com');
 
 const Chat = () => {
   const scrollRef = useRef();
+  const bottomRef = useRef();
   const dispatch = useDispatch();
   const { sellerId } = useParams();
-  const { userInfo } = useSelector(state => state.auth);
-  const { fb_messages, currentFd, my_friends, successMessage } = useSelector(state => state.chat);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { fb_messages, currentFd, my_friends, successMessage } = useSelector(
+    (state) => state.chat
+  );
 
   const [text, setText] = useState('');
   const [receverMessage, setReceverMessage] = useState('');
   const [activeSeller, setActiveSeller] = useState([]);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   // socket init
   useEffect(() => {
+    if (!userInfo) return;
     socket.emit('add_user', userInfo.id, userInfo);
-    socket.on('seller_message', msg => setReceverMessage(msg));
-    socket.on('activeSeller', sellers => setActiveSeller(sellers));
-  }, [userInfo]);
+    socket.on('seller_message', (msg) => setReceverMessage(msg));
+    socket.on('activeSeller', (sellers) => setActiveSeller(sellers));
+    socket.on('typing', (data) => {
+      if (data.senderId === sellerId) setIsTyping(data.status);
+    });
 
-  useEffect(() => {
-    dispatch(add_friend({ sellerId: sellerId || '', userId: userInfo.id }));
-  }, [sellerId]);
+    return () => {
+      socket.off('seller_message');
+      socket.off('activeSeller');
+      socket.off('typing');
+    };
+  }, [userInfo, sellerId]);
 
+  // Add friend
   useEffect(() => {
-    if (successMessage) {
+    if (userInfo && sellerId) {
+      dispatch(add_friend({ sellerId: sellerId || '', userId: userInfo.id }));
+    }
+  }, [sellerId, dispatch, userInfo]);
+
+  // Send message via socket
+  useEffect(() => {
+    if (successMessage && fb_messages.length) {
       socket.emit('send_customer_message', fb_messages[fb_messages.length - 1]);
       dispatch(messageClear());
     }
-  }, [successMessage]);
+  }, [successMessage, fb_messages, dispatch]);
 
+  // Receive message
   useEffect(() => {
-    if (receverMessage) {
-      if (sellerId === receverMessage.senderId && userInfo.id === receverMessage.receverId) {
-        dispatch(updateMessage(receverMessage));
-      } else {
-        toast.success(`${receverMessage.senderName} sent a message`);
-        dispatch(messageClear());
-      }
+    if (!receverMessage) return;
+    if (sellerId === receverMessage.senderId && userInfo.id === receverMessage.receverId) {
+      dispatch(updateMessage(receverMessage));
+    } else {
+      toast.success(`${receverMessage.senderName} sent a message`);
+      dispatch(messageClear());
     }
-  }, [receverMessage]);
+  }, [receverMessage, dispatch, sellerId, userInfo]);
 
+  // Auto scroll
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [fb_messages]);
 
   const send = () => {
     if (!text.trim()) return;
-    dispatch(send_message({
-      userId: userInfo.id,
-      text,
-      sellerId,
-      name: userInfo.name
-    }));
+    dispatch(
+      send_message({
+        userId: userInfo.id,
+        text,
+        sellerId,
+        name: userInfo.name
+      })
+    );
     setText('');
     setShowEmoji(false);
   };
 
   const onEmojiClick = (event, emojiObject) => {
-    setText(prev => prev + emojiObject.emoji);
+    setText((prev) => prev + emojiObject.emoji);
+  };
+
+  const handleTyping = (e) => {
+    setText(e.target.value);
+    socket.emit('typing', { senderId: userInfo.id, receiverId: sellerId, status: !!e.target.value });
   };
 
   return (
     <div className="flex flex-col md:flex-row w-full h-full bg-white rounded-md shadow-md overflow-hidden">
       {/* Sidebar */}
-      <div className={`bg-white md:w-64 w-full md:h-auto fixed md:relative top-0 left-0 z-20 transition-all duration-300 ${showSidebar ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+      <div
+        className={`bg-white md:w-64 w-full md:h-auto fixed md:relative top-0 left-0 z-20 transition-all duration-300 ${
+          showSidebar ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      >
         <div className="flex items-center justify-between h-12 border-b px-4 text-slate-600 font-semibold text-lg">
           <div className="flex items-center gap-2">
             <AiOutlineMessage /> Messages
           </div>
-          <button className="md:hidden" onClick={() => setShowSidebar(false)}>✕</button>
+          <button className="md:hidden" onClick={() => setShowSidebar(false)}>
+            ✕
+          </button>
         </div>
         <div className="flex flex-col overflow-y-auto h-[calc(100vh-3rem)]">
           <div className="p-2">
@@ -101,7 +138,7 @@ const Chat = () => {
             >
               <div className="relative w-10 h-10 rounded-full overflow-hidden">
                 <img src={f.image} alt={f.name} className="w-full h-full object-cover" />
-                {activeSeller.some(c => c.sellerId === f.fdId) && (
+                {activeSeller.some((c) => c.sellerId === f.fdId) && (
                   <span className="absolute w-3 h-3 bg-green-500 rounded-full bottom-0 right-0 border border-white"></span>
                 )}
               </div>
@@ -119,8 +156,12 @@ const Chat = () => {
             <div className="flex justify-between items-center p-3 border-b bg-white shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                  <img src={currentFd.image} alt={currentFd.name} className="w-full h-full object-cover" />
-                  {activeSeller.some(c => c.sellerId === currentFd.fdId) && (
+                  <img
+                    src={currentFd.image}
+                    alt={currentFd.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {activeSeller.some((c) => c.sellerId === currentFd.fdId) && (
                     <span className="absolute w-3 h-3 bg-green-500 rounded-full bottom-0 right-0 border border-white"></span>
                   )}
                 </div>
@@ -146,25 +187,28 @@ const Chat = () => {
             <div className="flex-1 overflow-y-auto p-3 bg-slate-100">
               <div className="flex flex-col gap-3">
                 {fb_messages.map((m, i) => {
-                  const isSender = m.receverId === currentFd.fdId;
+                  const isSender = m.userId === userInfo.id;
                   return (
                     <div
-                      ref={scrollRef}
                       key={i}
-                      className={`flex gap-2 ${isSender ? 'justify-end' : 'justify-start'} items-center`}
+                      className={`flex gap-2 ${isSender ? 'justify-end' : 'justify-start'} items-end`}
                     >
                       {!isSender && (
                         <img
-                          src="http:/images/user.png"
+                          src="/images/user.png"
                           alt="user"
                           className="w-8 h-8 rounded-full"
                         />
                       )}
                       <div
-                        className={`p-2 rounded-md max-w-xs break-words text-white ${isSender ? 'bg-cyan-500' : 'bg-purple-500'} animate-fade-in`}
+                        className={`p-2 rounded-2xl max-w-xs break-words text-white ${
+                          isSender ? 'bg-cyan-500' : 'bg-purple-500'
+                        } animate-fade-in relative`}
                       >
                         {m.message}
-                        <div className="text-xs text-gray-200 mt-1">{m.timestamp || ''}</div>
+                        {m.timestamp && (
+                          <div className="text-xs text-gray-200 mt-1">{m.timestamp}</div>
+                        )}
                       </div>
                       {isSender && (
                         <img
@@ -176,6 +220,13 @@ const Chat = () => {
                     </div>
                   );
                 })}
+                {isTyping && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse"></div>
+                    <span className="text-sm text-gray-500">Typing...</span>
+                  </div>
+                )}
+                <div ref={bottomRef} />
               </div>
             </div>
 
@@ -190,7 +241,7 @@ const Chat = () => {
                 <input
                   type="text"
                   value={text}
-                  onChange={e => setText(e.target.value)}
+                  onChange={handleTyping}
                   placeholder="Type a message"
                   className="w-full rounded-full h-10 px-4 outline-none border border-slate-300 pr-10 focus:ring-2 focus:ring-sky-400 transition"
                   onFocus={() => setShowEmoji(false)}
