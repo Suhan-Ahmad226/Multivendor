@@ -53,7 +53,7 @@ const Dashboard = () => {
         >
           <div className="p-5 flex justify-between items-center border-b">
             <h2 className="font-bold text-lg text-gray-700">Menu</h2>
-            <button className="md:hidden text-xl" onClick={() => setSidebarOpen(false)}>×</button>
+            <button className="md:hidden text-2xl font-bold" onClick={() => setSidebarOpen(false)}>×</button>
           </div>
           <ul className="mt-4">
             {sidebarLinks.map((link, idx) => (
@@ -61,7 +61,7 @@ const Dashboard = () => {
                 {link.path ? (
                   <Link
                     to={link.path}
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-green-600"
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-green-600 transition-colors"
                     onClick={() => setSidebarOpen(false)}
                   >
                     <span className="text-xl">{link.icon}</span>
@@ -70,7 +70,7 @@ const Dashboard = () => {
                 ) : (
                   <button
                     onClick={link.action}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600 transition-colors"
                   >
                     <span className="text-xl">{link.icon}</span>
                     {link.label}
@@ -85,7 +85,7 @@ const Dashboard = () => {
         <div className="md:hidden fixed top-5 left-5 z-40">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="bg-green-500 text-white p-3 rounded-md shadow flex items-center justify-center"
+            className="bg-green-500 text-white p-3 rounded-md shadow flex items-center justify-center hover:bg-green-600 transition"
           >
             <FaList />
           </button>
