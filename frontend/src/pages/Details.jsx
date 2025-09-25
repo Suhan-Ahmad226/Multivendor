@@ -234,7 +234,7 @@ const Details = () => {
       {/* hero/banner */}
       <section
         className="relative h-[220px] mt-6 bg-cover bg-no-repeat bg-left"
-        style={{ backgroundImage: 'url("http://localhost:3000/images/banner/shop.png")' }}
+        style={{ backgroundImage: 'url("/images/banner/shop.png")' }}
       >
         <div className="absolute inset-0 bg-[#2422228a] flex items-center">
           <div className="w-[90%] mx-auto text-white">
