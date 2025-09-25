@@ -7,14 +7,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { place_order } from '../store/reducers/orderReducer';
 
 const Shipping = () => {
+    const { state: { products, price, shipping_fee, items } } = useLocation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { userInfo } = useSelector(state => state.auth);
 
-    const { state: {products,price,shipping_fee,items }} = useLocation()
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const {userInfo} = useSelector(state => state.auth) 
-
-    const [res, setRes] = useState(false)
-    const [state, setState] = useState({
+    const [res, setRes] = useState(false);
+    const [stateForm, setStateForm] = useState({
         name: '',
         address: '',
         phone: '',
@@ -22,23 +21,19 @@ const Shipping = () => {
         province: '',
         city: '',
         area: ''
-    })
+    });
 
     const inputHandle = (e) => {
-        setState({
-            ...state,
-            [e.target.name]: e.target.value
-        })
-    }
+        setStateForm({ ...stateForm, [e.target.name]: e.target.value });
+    };
 
     const save = (e) => {
-        e.preventDefault()
-        const {name,address,phone,post,province,city,area } = state;
+        e.preventDefault();
+        const { name, address, phone, post, province, city, area } = stateForm;
         if (name && address && phone && post && province && city && area) {
-            setRes(true)
+            setRes(true);
         }
-
-    }
+    };
 
     const placeOrder = () => {
         dispatch(place_order({
@@ -46,198 +41,152 @@ const Shipping = () => {
             products,
             shipping_fee,
             items,
-            shippingInfo : state,
+            shippingInfo: stateForm,
             userId: userInfo.id,
-            navigate 
-
-        }))
-    }
+            navigate
+        }));
+    };
 
     return (
-        <div>
-          <Header/>
-          <section className='bg-[url("http://localhost:3000/images/banner/shop.png")] h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left'>
-            <div className='absolute left-0 top-0 w-full h-full bg-[#2422228a]'>
-                <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto'>
-                    <div className='flex flex-col justify-center gap-1 items-center h-full w-full text-white'>
-                <h2 className='text-3xl font-bold'>Shipping Page </h2>
-                <div className='flex justify-center items-center gap-2 text-2xl w-full'>
-                        <Link to='/'>Home</Link>
-                        <span className='pt-1'>
-                        <IoIosArrowForward />
-                        </span>
-                        <span>Shipping </span>
-                      </div>
-                    </div> 
-                </div> 
-            </div> 
-           </section>
+        <div className="flex flex-col min-h-screen">
+            <Header />
 
-
-    <section className='bg-[#eeeeee]'>
-        <div className='w-[85%] lg:w-[90%] md:w-[90%] sm:w-[90%] mx-auto py-16'>
-           <div className='w-full flex flex-wrap'>
-            <div className='w-[67%] md-lg:w-full'>
-                <div className='flex flex-col gap-3'>
-                    <div className='bg-white p-6 shadow-sm rounded-md'>
-
-                        <h2 className='text-slate-600 font-bold pb-3'>Shipping Information </h2>
-
-            {
-              !res && <>
-             <form onSubmit={save}>
-            <div className='flex md:flex-col md:gap-2 w-full gap-5 text-slate-600'>
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="name"> Name </label>
-                <input onChange={inputHandle} value={state.name} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="name" id="name" placeholder='Name' /> 
-            </div>
-
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="address"> Address </label>
-                <input onChange={inputHandle} value={state.address} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="address" id="address" placeholder='Address' /> 
-            </div> 
-            </div>
-
-            <div className='flex md:flex-col md:gap-2 w-full gap-5 text-slate-600'>
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="phone"> Phone </label>
-                <input onChange={inputHandle} value={state.phone} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="phone" id="phone" placeholder='Phone' /> 
-            </div>
-
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="post"> Post </label>
-                <input onChange={inputHandle} value={state.post} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="post" id="post" placeholder='Post' /> 
-            </div> 
-            </div>
-
-            <div className='flex md:flex-col md:gap-2 w-full gap-5 text-slate-600'>
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="province"> Province </label>
-                <input onChange={inputHandle} value={state.province} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="province" id="province" placeholder='Province' /> 
-            </div>
-
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="city"> City </label>
-                <input onChange={inputHandle} value={state.city} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="city" id="city" placeholder='City' /> 
-            </div> 
-            </div>
-
-
-            <div className='flex md:flex-col md:gap-2 w-full gap-5 text-slate-600'>
-            <div className='flex flex-col gap-1 mb-2 w-full'>
-                <label htmlFor="area"> Area </label>
-                <input onChange={inputHandle} value={state.area} type="text" className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' name="area" id="area" placeholder='Area' /> 
-            </div>
-
-            <div className='flex flex-col gap-1 mt-7 mb-2 w-full'>
-               <button className='px-3 py-[6px] rounded-sm hover:shadow-green-500/50 hover:shadow-lg bg-green-500 text-white'>Save Change </button>
-            </div> 
-            </div> 
-                </form>
-
-                
-                </>
-            }
-
-            {
-                res && <div className='flex flex-col gap-1'>
-                <h2 className='text-slate-600 font-semibold pb-2'>Deliver To {state.name}</h2>
-                <p>
-                    <span className='bg-blue-200 text-blue-800 text-sm font-medium mr-2 px-2 py-1 rounded'>Home</span>
-                    <span>{state.phone} {state.address} {state.province} {state.city} {state.area}  </span>
-
-                    <span onClick={() => setRes(false)} className='text-indigo-500 cursor-pointer'>Change </span>
-                </p>
-
-                <p className='text-slate-600 text-sm' >Email To ariyan@gmail.com</p>
-
-            </div>
-            }
-              </div>
-
-              {
-                   products.map((p,i) => <div key={i} className='flex bg-white p-4 flex-col gap-2'>
-                   <div className='flex justify-start items-center'>
-                       <h2 className='text-md text-slate-600 font-bold'>{p.shopName}</h2>
-                   </div>
-
-                   {
-                       p.products.map((pt,i) => <div className='w-full flex flex-wrap'>
-                       <div className='flex sm:w-full gap-2 w-7/12'>
-                           <div className='flex gap-2 justify-start items-center'>
-                       <img className='w-[80px] h-[80px]' src={pt.productInfo.images[0]} alt="" />
-                       <div className='pr-4 text-slate-600'>
-                       <h2 className='text-md font-semibold'>{pt.productInfo.name} </h2>
-                       <span className='text-sm'>Brand: {pt.productInfo.brand}</span>
-                       </div>
-                           </div>
-                       </div>
-
-   <div className='flex justify-between w-5/12 sm:w-full sm:mt-3'>
-       <div className='pl-4 sm:pl-0'>
-       <h2 className='text-lg text-orange-500'>${pt.productInfo.price - Math.floor((pt.productInfo.price * pt.productInfo.discount) / 100)}</h2>
-           <p className='line-through'>${pt.productInfo.price}</p>
-           <p>-{pt.productInfo.discount}%</p>
-       </div>
-      
-   </div>
-
-
-                   </div>)
-                   }
-
-               </div>) 
-                } 
- 
-
-                </div> 
-            </div>
-
-            <div className='w-[33%] md-lg:w-full'>
-    <div className='pl-3 md-lg:pl-0 md-lg:mt-5'>
-        
-            <div className='bg-white p-3 text-slate-600 flex flex-col gap-3'>
-                <h2 className='text-xl font-bold'>Order Summary</h2>
-                <div className='flex justify-between items-center'>
-                    <span>Items Total (items) </span>
-                    <span>${price}</span>
+            {/* Banner */}
+            <section className="relative h-[220px] bg-cover bg-no-repeat bg-left mt-6" style={{ backgroundImage: 'url(http://localhost:3000/images/banner/shop.png)' }}>
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                    <div className="text-center text-white">
+                        <h2 className="text-3xl md:text-4xl font-bold">Shipping Page</h2>
+                        <div className="flex justify-center items-center gap-2 text-lg md:text-xl mt-2">
+                            <Link to="/" className="hover:text-indigo-400 transition-colors">Home</Link>
+                            <IoIosArrowForward className="mt-1" />
+                            <span>Shipping</span>
+                        </div>
+                    </div>
                 </div>
-                <div className='flex justify-between items-center'>
-                    <span>Delivery Fee </span>
-                    <span>${shipping_fee} </span>
+            </section>
+
+            {/* Shipping & Order Summary */}
+            <section className="bg-gray-100 py-16">
+                <div className="w-[90%] max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-8">
+                    
+                    {/* Shipping Form */}
+                    <div className="flex-1">
+                        <div className="bg-white p-6 shadow-md rounded-md flex flex-col gap-5">
+                            <h2 className="text-xl md:text-2xl font-bold text-slate-700">Shipping Information</h2>
+
+                            {!res ? (
+                                <form onSubmit={save} className="flex flex-col gap-4">
+                                    <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div className="flex flex-col">
+                                            <label className="text-slate-600 font-medium">Name</label>
+                                            <input name="name" value={stateForm.name} onChange={inputHandle} placeholder="Name" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <label className="text-slate-600 font-medium">Address</label>
+                                            <input name="address" value={stateForm.address} onChange={inputHandle} placeholder="Address" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div className="flex flex-col">
+                                            <label className="text-slate-600 font-medium">Phone</label>
+                                            <input name="phone" value={stateForm.phone} onChange={inputHandle} placeholder="Phone" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <label className="text-slate-600 font-medium">Post</label>
+                                            <input name="post" value={stateForm.post} onChange={inputHandle} placeholder="Post" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div className="flex flex-col">
+                                            <label className="text-slate-600 font-medium">Province</label>
+                                            <input name="province" value={stateForm.province} onChange={inputHandle} placeholder="Province" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <label className="text-slate-600 font-medium">City</label>
+                                            <input name="city" value={stateForm.city} onChange={inputHandle} placeholder="City" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <label className="text-slate-600 font-medium">Area</label>
+                                        <input name="area" value={stateForm.area} onChange={inputHandle} placeholder="Area" className="border p-2 rounded-md focus:border-green-500 outline-none" />
+                                    </div>
+
+                                    <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors shadow-md hover:shadow-lg">Save Changes</button>
+                                </form>
+                            ) : (
+                                <div className="flex flex-col gap-3 text-slate-700">
+                                    <h3 className="text-lg font-semibold">Deliver To {stateForm.name}</h3>
+                                    <p className="flex flex-wrap gap-2 items-center">
+                                        <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm font-medium">Home</span>
+                                        <span>{stateForm.phone}, {stateForm.address}, {stateForm.province}, {stateForm.city}, {stateForm.area}</span>
+                                        <span onClick={() => setRes(false)} className="text-indigo-500 cursor-pointer hover:underline">Change</span>
+                                    </p>
+                                    <p className="text-sm text-slate-600">Email: ariyan@gmail.com</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Products */}
+                        {products.map((p, i) => (
+                            <div key={i} className="bg-white mt-5 p-4 shadow-md rounded-md flex flex-col gap-4">
+                                <h4 className="font-semibold text-slate-700">{p.shopName}</h4>
+                                {p.products.map((pt, idx) => (
+                                    <div key={idx} className="flex flex-wrap items-center justify-between gap-4 border-b py-2">
+                                        <div className="flex gap-4 items-center sm:w-full w-7/12">
+                                            <img className="w-20 h-20 object-cover rounded-md" src={pt.productInfo.images[0]} alt={pt.productInfo.name} />
+                                            <div className="text-slate-700">
+                                                <h5 className="font-semibold">{pt.productInfo.name}</h5>
+                                                <p className="text-sm">Brand: {pt.productInfo.brand}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-start sm:w-full w-5/12 gap-1">
+                                            <span className="text-orange-500 font-semibold text-lg">${pt.productInfo.price - Math.floor((pt.productInfo.price * pt.productInfo.discount) / 100)}</span>
+                                            <span className="line-through text-sm text-gray-400">${pt.productInfo.price}</span>
+                                            <span className="text-red-500 text-sm">-{pt.productInfo.discount}%</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Order Summary */}
+                    <div className="w-full lg:w-1/3 flex flex-col gap-4">
+                        <div className="bg-white p-5 shadow-md rounded-md flex flex-col gap-4 text-slate-700">
+                            <h3 className="text-xl font-bold">Order Summary</h3>
+                            <div className="flex justify-between">
+                                <span>Items Total ({items})</span>
+                                <span>${price}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Delivery Fee</span>
+                                <span>${shipping_fee}</span>
+                            </div>
+                            <div className="flex justify-between font-semibold">
+                                <span>Total Payment</span>
+                                <span>${price + shipping_fee}</span>
+                            </div>
+                            <div className="flex justify-between text-lg text-green-600 font-bold">
+                                <span>Total</span>
+                                <span>${price + shipping_fee}</span>
+                            </div>
+
+                            <button
+                                onClick={placeOrder}
+                                disabled={!res}
+                                className={`px-5 py-2 rounded-md uppercase text-white font-semibold transition-colors ${res ? 'bg-red-500 hover:bg-red-600 shadow-lg' : 'bg-red-300 cursor-not-allowed'}`}
+                            >
+                                Place Order
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            </section>
 
-                <div className='flex justify-between items-center'>
-                    <span>Total Payment </span>
-                    <span>${price + shipping_fee} </span>
-                </div>
-               
-
-                <div className='flex justify-between items-center'>
-                    <span>Total</span>
-                    <span className='text-lg text-[#059473]'>${price + shipping_fee} </span>
-                </div>
-                <button onClick={placeOrder} disabled={res ? false : true} className={`px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg ${res ? 'bg-red-500' : 'bg-red-300'}  text-sm text-white uppercase`}>
-                   Place Order 
-                </button>
-
-            </div>
-        
-
-    </div>
-
-</div>
-
-
-
-            </div>  
-
-        </div>
-        
-        
-   </section>       
-
-          <Footer/>
+            <Footer />
         </div>
     );
 };
