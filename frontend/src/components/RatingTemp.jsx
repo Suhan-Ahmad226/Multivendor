@@ -2,79 +2,26 @@ import React from 'react';
 import { FaStar } from 'react-icons/fa';
 import { CiStar } from 'react-icons/ci';
 
-const RatingTemp = ({rating}) => {
-     if (rating === 5) {
-        return (
-            <>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            </>
-        ) 
-     }
+const RatingTemp = ({ rating }) => {
+  // ৫টি স্টার অ্যারের মাধ্যমে ডাইনামিক রেন্ডার
+  const totalStars = 5;
+  const starsArray = Array.from({ length: totalStars }, (_, index) => {
+    return index < rating ? 'filled' : 'empty';
+  });
 
-     else if (rating === 4) {
-        return (
-            <>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            </>
-        ) 
-     }
-
-     else if (rating === 3) {
-        return (
-            <>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            </>
-        ) 
-     }
-     else if (rating === 2) {
-        return (
-            <>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            </>
-        ) 
-     }
-     else if (rating === 1) {
-        return (
-            <>
-            <span className='text-[#Edbb0E]'><FaStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            </>
-        ) 
-     }
-     else  {
-        return (
-            <>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            <span className='text-[#Edbb0E]'><CiStar/></span>
-            </>
-        ) 
-     }
-
-
-
-    
+  return (
+    <div className="flex items-center space-x-1">
+      {starsArray.map((star, idx) => (
+        <span
+          key={idx}
+          className={`text-[#EDBB0E] transition-transform duration-300 hover:scale-125`}
+        >
+          {star === 'filled' ? <FaStar size={20} /> : <CiStar size={20} />}
+        </span>
+      ))}
+      <span className="ml-2 text-gray-700 font-medium">{rating}/{totalStars}</span>
+    </div>
+  );
 };
 
 export default RatingTemp;
