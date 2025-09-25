@@ -52,7 +52,7 @@ const Shipping = () => {
             <Header />
 
             {/* Banner */}
-            <section className="relative h-[220px] bg-cover bg-no-repeat bg-left mt-6" style={{ backgroundImage: 'url(http://localhost:3000/images/banner/shop.png)' }}>
+            <section className="relative h-[220px] bg-cover bg-no-repeat bg-left mt-6" style={{ backgroundImage: 'url(/images/banner/shop.png)' }}>
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                     <div className="text-center text-white">
                         <h2 className="text-3xl md:text-4xl font-bold">Shipping Page</h2>
