@@ -1,130 +1,160 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { FaFacebookF } from "react-icons/fa6";
-import { FaGoogle } from "react-icons/fa6"; 
+import { FaFacebookF, FaGoogle } from "react-icons/fa6";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { customer_login,messageClear } from '../store/reducers/authReducer';
+import { customer_login, messageClear } from '../store/reducers/authReducer';
 import toast from 'react-hot-toast';
 import { FadeLoader } from 'react-spinners';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const Login = () => {
 
-    const navigate = useNavigate()
-    const {loader,errorMessage,successMessage,userInfo } = useSelector(state => state.auth)
-    const dispatch = useDispatch()
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { loader, errorMessage, successMessage, userInfo } = useSelector(state => state.auth);
 
-    const [state, setState] = useState({ 
-        email: '',
-        password: ''
-    })
+    const [state, setState] = useState({ email: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
 
     const inputHandle = (e) => {
-        setState({
-            ...state,
-            [e.target.name]: e.target.value
-        })
-    }
- 
+        setState({ ...state, [e.target.name]: e.target.value });
+    };
+
     const login = (e) => {
-        e.preventDefault()
-        dispatch(customer_login(state))
-    }
+        e.preventDefault();
+        dispatch(customer_login(state));
+    };
 
-    useEffect(() => { 
+    useEffect(() => {
         if (successMessage) {
-            toast.success(successMessage)
-            dispatch(messageClear())  
-        } 
-        if (errorMessage) {
-            toast.error(errorMessage)
-            dispatch(messageClear())  
-        } 
-        if (userInfo) {
-            navigate('/')
+            toast.success(successMessage);
+            dispatch(messageClear());
         }
-    },[successMessage,errorMessage])
-
+        if (errorMessage) {
+            toast.error(errorMessage);
+            dispatch(messageClear());
+        }
+        if (userInfo) {
+            navigate('/');
+        }
+    }, [successMessage, errorMessage, userInfo, dispatch, navigate]);
 
     return (
-        <div>
-             {
-                loader && <div className='w-screen h-screen flex justify-center items-center fixed left-0 top-0 bg-[#38303033] z-[999]'>
-                    <FadeLoader/>
+        <div className="relative">
+            {loader && (
+                <div className='w-screen h-screen flex justify-center items-center fixed left-0 top-0 bg-[#38303033] z-[999]'>
+                    <FadeLoader color="#059473" />
                 </div>
-            }
-            <Header/>
-    <div className='bg-slate-200 mt-4'>
-        <div className='w-full justify-center items-center p-10'>
-            <div className='grid grid-cols-2 w-[60%] mx-auto bg-white rounded-md'>
-                <div className='px-8 py-8'>
-            <h2 className='text-center w-full text-xl text-slate-600 font-bold'>Login </h2> 
+            )}
 
-    <div>
-        <form onSubmit={login} className='text-slate-600'>
-    
+            <Header />
 
-    <div className='flex flex-col gap-1 mb-2'>
-        <label htmlFor="email">Email</label>
-        <input onChange={inputHandle} value={state.email}  className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' type="email" name="email" id="email" placeholder='Email' required />
-    </div>
+            <div className='bg-slate-100 min-h-screen flex justify-center items-center py-10 px-3'>
+                <div className='grid grid-cols-1 md:grid-cols-2 w-full max-w-6xl bg-white rounded-lg shadow-lg overflow-hidden'>
+                    
+                    {/* Left Side - Form */}
+                    <div className='p-10 flex flex-col justify-center'>
+                        <h2 className='text-3xl font-bold text-slate-700 mb-6 text-center'>Login</h2>
 
+                        <form onSubmit={login} className='flex flex-col gap-4'>
+                            {/* Email */}
+                            <div className='flex flex-col gap-1'>
+                                <label htmlFor="email" className='text-slate-600 font-medium'>Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={state.email}
+                                    onChange={inputHandle}
+                                    placeholder="Email"
+                                    required
+                                    className='w-full px-4 py-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 transition-all duration-300'
+                                />
+                            </div>
 
-    <div className='flex flex-col gap-1 mb-2'>
-        <label htmlFor="password">Password</label>
-        <input onChange={inputHandle} value={state.password}  className='w-full px-3 py-2 border border-slate-200 outline-none focus:border-green-500 rounded-md' type="password" name="password" id="password" placeholder='Password' required />
-    </div>
+                            {/* Password */}
+                            <div className='flex flex-col gap-1 relative'>
+                                <label htmlFor="password" className='text-slate-600 font-medium'>Password</label>
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    name="password"
+                                    value={state.password}
+                                    onChange={inputHandle}
+                                    placeholder="Password"
+                                    required
+                                    className='w-full px-4 py-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 transition-all duration-300'
+                                />
+                                <span
+                                    className='absolute right-3 top-10 cursor-pointer text-slate-500 hover:text-green-500 transition-all duration-300'
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+                                </span>
+                            </div>
 
-    <button className='px-8 w-full py-2 bg-[#059473] shadow-lg hover:shadow-green-500/40 text-white rounded-md'>Login</button>
- 
-        </form>
-    <div className='flex justify-center items-center py-2'>
-        <div className='h-[1px] bg-slate-300 w-[95%]'> </div>
-        <span className='px-3 text-slate-600'>Or</span>
-        <div className='h-[1px] bg-slate-300 w-[95%]'> </div>
-    </div>
+                            {/* Forgot Password */}
+                            <div className='text-right'>
+                                <Link to='/forgot-password' className='text-blue-500 hover:underline text-sm'>Forgot Password?</Link>
+                            </div>
 
-    <button className='px-8 w-full py-2 bg-indigo-500 shadow hover:shadow-indigo-500/50 text-white rounded-md flex justify-center items-center gap-2 mb-3'>
-        <span><FaFacebookF /> </span>
-        <span>Login With Facebook </span>
-    </button>
+                            {/* Login Button */}
+                            <button
+                                type='submit'
+                                disabled={loader}
+                                className={`w-full py-3 rounded-md text-white font-semibold transition-all duration-300 ${
+                                    loader ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50'
+                                }`}
+                            >
+                                {loader ? 'Logging in...' : 'Login'}
+                            </button>
+                        </form>
 
-    <button className='px-8 w-full py-2 bg-red-500 shadow hover:shadow-red-500/50 text-white rounded-md flex justify-center items-center gap-2 mb-3'>
-        <span><FaGoogle  /></span>
-        <span>Login With Google </span>
-    </button> 
-    </div>    
+                        {/* Divider */}
+                        <div className='flex items-center justify-center gap-3 my-5'>
+                            <hr className='w-full border-slate-300' />
+                            <span className='text-slate-500 text-sm'>OR</span>
+                            <hr className='w-full border-slate-300' />
+                        </div>
 
-    <div className='text-center text-slate-600 pt-1'>
-        <p>Don't Have An Account ? <Link className='text-blue-500' to='/register'> Register</Link> </p>
-    </div> 
+                        {/* Social Login */}
+                        <div className='flex flex-col gap-3'>
+                            <button className='w-full py-3 flex justify-center items-center gap-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow hover:shadow-indigo-500/50 transition-all duration-300'>
+                                <FaFacebookF /> Login With Facebook
+                            </button>
 
-     <a target='_blank' href="http://localhost:3001/login">
-     <div className='px-8 w-full py-2 bg-[#02e3e0] shadow hover:shadow-red-500/50 text-white rounded-md flex justify-center items-center gap-2 mb-3'>
-            Login As a Seller
-     </div>
-     </a>
- 
-     <a target='_blank' href="http://localhost:3001/register">
-     <div className='px-8 w-full py-2 bg-[#ad2cc4] shadow hover:shadow-red-500/50 text-white rounded-md flex justify-center items-center gap-2 mb-3'>
-            Register As a Seller
-     </div>
-     </a>
+                            <button className='w-full py-3 flex justify-center items-center gap-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow hover:shadow-red-500/50 transition-all duration-300'>
+                                <FaGoogle /> Login With Google
+                            </button>
+                        </div>
 
+                        {/* Register Link */}
+                        <p className='text-center mt-5 text-slate-600'>
+                            Don't have an account? <Link to='/register' className='text-blue-500 hover:underline'>Register</Link>
+                        </p>
 
+                        {/* Seller Login/Register */}
+                        <div className='flex flex-col gap-3 mt-5'>
+                            <a target='_blank' rel='noreferrer' href="https://multivendor-hiil.vercel.app/login" className='w-full py-3 text-white text-center bg-cyan-500 rounded-md hover:bg-cyan-600 transition-all duration-300 shadow hover:shadow-cyan-400/50'>
+                                Login As a Seller
+                            </a>
+                            <a target='_blank' rel='noreferrer' href="https://multivendor-hiil.vercel.app/register" className='w-full py-3 text-white text-center bg-purple-600 rounded-md hover:bg-purple-700 transition-all duration-300 shadow hover:shadow-purple-400/50'>
+                                Register As a Seller
+                            </a>
+                        </div>
+                    </div>
 
-            </div> 
+                    {/* Right Side - Image */}
+                    <div className='hidden md:flex justify-center items-center bg-green-50'>
+                        <img src="/images/login.jpg" alt="Login Illustration" className='w-full h-full object-cover'/>
+                    </div>
 
-        <div className='w-full h-full py-4 pr-4'>
-            <img src="http://localhost:3000/images/login.jpg" alt="" />
-         </div>    
+                </div>
+            </div>
 
-         </div>
-        </div>
-    </div>        
-            
-            <Footer/>
+            <Footer />
         </div>
     );
 };
