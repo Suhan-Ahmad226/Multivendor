@@ -34,7 +34,7 @@ const Payment = () => {
                                     paymentMethod === 'stripe' ? 'bg-white shadow-md rounded-t-md scale-105' : 'bg-gray-200 hover:bg-gray-300'
                                 }`}
                             >
-                                <img src="http://localhost:3000/images/payment/stripe.png" alt="Stripe" className="h-12 mb-2" />
+                                <img src="/images/payment/stripe.png" alt="Stripe" className="h-12 mb-2" />
                                 <span className="text-gray-600 font-medium">Stripe</span>
                             </div>
 
@@ -45,7 +45,7 @@ const Payment = () => {
                                     paymentMethod === 'cod' ? 'bg-white shadow-md rounded-t-md scale-105' : 'bg-gray-200 hover:bg-gray-300'
                                 }`}
                             >
-                                <img src="http://localhost:3000/images/payment/cod.jpg" alt="COD" className="h-12 mb-2" />
+                                <img src="/images/payment/cod.jpg" alt="COD" className="h-12 mb-2" />
                                 <span className="text-gray-600 font-medium">COD</span>
                             </div>
                         </div>
