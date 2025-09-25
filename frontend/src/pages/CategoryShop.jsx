@@ -70,7 +70,7 @@ const CategoryShop = () => {
       {/* Banner */}
       <section
         className="relative h-[220px] bg-cover bg-no-repeat bg-left"
-        style={{ backgroundImage: 'url("http://localhost:3000/images/banner/shop.png")' }}
+        style={{ backgroundImage: 'url("/images/banner/shop.png")' }}
       >
         <div className="absolute inset-0 bg-black/50 flex flex-col justify-center items-center text-white">
           <h2 className="text-3xl font-bold">Category Page</h2>
