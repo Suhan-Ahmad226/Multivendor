@@ -2,32 +2,34 @@ import React from 'react';
 import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
 import { CiStar } from 'react-icons/ci';
 
-const Rating = ({ratings}) => {
-    return (
-        <>
-        {
-            ratings >= 1 ? <span className='text-[#EDBB0E]'><FaStar/></span> :
-            ratings >= .5 ? <span className='text-[#EDBB0E]'><FaStarHalfAlt/></span> : <span className='text-slate-600'><CiStar/></span>
+const Rating = ({ ratings, className = "" }) => {
+  // একটি অ্যারে তৈরি করা হয়েছে 5 স্টার পর্যন্ত
+  const stars = [1, 2, 3, 4, 5];
+
+  return (
+    <div className={`flex items-center space-x-1 ${className}`}>
+      {stars.map((star, index) => {
+        let StarIcon;
+        if (ratings >= star) {
+          StarIcon = FaStar;
+        } else if (ratings >= star - 0.5) {
+          StarIcon = FaStarHalfAlt;
+        } else {
+          StarIcon = CiStar;
         }
-        {
-            ratings >= 2 ? <span className='text-[#EDBB0E]'><FaStar/></span> :
-            ratings >= 1.5 ? <span className='text-[#EDBB0E]'><FaStarHalfAlt/></span> : <span className='text-slate-600'><CiStar/></span>
-        }
-        {
-            ratings >= 3 ? <span className='text-[#EDBB0E]'><FaStar/></span> :
-            ratings >= 2.5 ? <span className='text-[#EDBB0E]'><FaStarHalfAlt/></span> : <span className='text-slate-600'><CiStar/></span>
-        }
-        {
-            ratings >= 4 ? <span className='text-[#EDBB0E]'><FaStar/></span> :
-            ratings >= 3.5 ? <span className='text-[#EDBB0E]'><FaStarHalfAlt/></span> : <span className='text-slate-600'><CiStar/></span>
-        }
-        {
-            ratings >= 5 ? <span className='text-[#EDBB0E]'><FaStar/></span> :
-            ratings >= 4.5 ? <span className='text-[#EDBB0E]'><FaStarHalfAlt/></span> : <span className='text-slate-600'><CiStar/></span>
-        }
-            
-        </>
-    );
+
+        return (
+          <span
+            key={index}
+            className={`text-[#EDBB0E] transition-transform duration-300 hover:scale-125`}
+          >
+            <StarIcon size={20} />
+          </span>
+        );
+      })}
+      <span className="text-slate-600 ml-2 font-medium">{ratings.toFixed(1)}</span>
+    </div>
+  );
 };
 
 export default Rating;
