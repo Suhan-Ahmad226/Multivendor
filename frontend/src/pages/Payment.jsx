@@ -17,6 +17,7 @@ const Payment = () => {
         exit: { opacity: 0, x: -50 }
     };
 
+    
     if (!state || !orderId) {
         return <Navigate to="/" replace />;
     }
