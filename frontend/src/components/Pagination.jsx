@@ -1,55 +1,125 @@
 import React from 'react';
-import { MdOutlineKeyboardDoubleArrowLeft,MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
+import {
+  MdOutlineKeyboardDoubleArrowLeft,
+  MdOutlineKeyboardDoubleArrowRight,
+  MdFirstPage,
+  MdLastPage
+} from "react-icons/md";
 
+const Pagination = ({
+  pageNumber,
+  setPageNumber,
+  totalItem,
+  parPage,
+  setParPage,
+  showItem
+}) => {
+  let totalPage = Math.ceil(totalItem / parPage);
+  let startPage = pageNumber;
+  let dif = totalPage - pageNumber;
 
-const Pagination = ({pageNumber,setPageNumber,totalItem,parPage,showItem}) => {
+  if (dif <= showItem) {
+    startPage = totalPage - showItem;
+  }
+  let endPage = startPage < 0 ? showItem : showItem + startPage;
 
-    let totalPage = Math.ceil(totalItem / parPage)
-    let startPage = pageNumber
+  if (startPage <= 0) {
+    startPage = 1;
+  }
 
-    let dif = totalPage - pageNumber
-    if (dif <= showItem) {
-        startPage = totalPage - showItem
+  const createBtn = () => {
+    const btns = [];
+    for (let i = startPage; i < endPage; i++) {
+      btns.push(
+        <li
+          key={i}
+          onClick={() => setPageNumber(i)}
+          className={`transition-all duration-300 ease-in-out 
+            ${pageNumber === i
+              ? "bg-green-600 text-white shadow-md scale-110"
+              : "bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white"}
+            w-[40px] h-[40px] rounded-full flex justify-center items-center cursor-pointer font-medium`}
+        >
+          {i}
+        </li>
+      );
     }
-    let endPage = startPage < 0 ? showItem : showItem + startPage
-     
-    if (startPage <= 0) {
-        startPage = 1
-    }
+    return btns;
+  };
 
-    const createBtn = () => {
+  return (
+    <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
+      {/* Pagination */}
+      <ul className="flex gap-2 md:gap-3 flex-wrap justify-center items-center">
+        {/* First Page */}
+        {pageNumber > 1 && (
+          <li
+            onClick={() => setPageNumber(1)}
+            className="w-[40px] h-[40px] rounded-full flex justify-center items-center bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white cursor-pointer transition-all duration-300"
+          >
+            <MdFirstPage size={20} />
+          </li>
+        )}
 
-        const btns = []
-        for (let i = startPage; i < endPage; i++) {
-            btns.push(
-                <li onClick={()=>setPageNumber(i)} className={` ${pageNumber === i ? 'bg-green-700 shadow-lg shadow-indigo-300/50 text-white' : 'bg-slate-600 hover:bg-green-400 shadow-lg hover:shadow-indigo-500/50 hover:text-white text-[#d0d2d6]'} w-[33px] h-[33px] rounded-full flex justify-center items-center cursor-pointer `}>
-                    {i}                    
-                </li>
-            ) 
-        }
-        return btns
-    }
+        {/* Previous */}
+        {pageNumber > 1 && (
+          <li
+            onClick={() => setPageNumber(pageNumber - 1)}
+            className="w-[40px] h-[40px] rounded-full flex justify-center items-center bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white cursor-pointer transition-all duration-300"
+          >
+            <MdOutlineKeyboardDoubleArrowLeft size={20} />
+          </li>
+        )}
 
-    return (
-        <ul className='flex gap-3'>
-            {
-                pageNumber > 1 && <li onClick={() => setPageNumber(pageNumber - 1)} className='w-[33px] h-[33px] rounded-full flex justify-center items-center bg-slate-300 text-[#000000] cursor-pointer'>
-                    <MdOutlineKeyboardDoubleArrowLeft />
-                </li>
-            }
-            {
-                createBtn()
-            }
-            {
-                pageNumber < totalPage && <li onClick={() => setPageNumber(pageNumber + 1)} className='w-[33px] h-[33px] rounded-full flex justify-center items-center bg-slate-300 text-[#000000] cursor-pointer'>
-                    <MdOutlineKeyboardDoubleArrowRight  />
-                </li>
-            }
+        {createBtn()}
 
-        </ul>
-    )
+        {/* Next */}
+        {pageNumber < totalPage && (
+          <li
+            onClick={() => setPageNumber(pageNumber + 1)}
+            className="w-[40px] h-[40px] rounded-full flex justify-center items-center bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white cursor-pointer transition-all duration-300"
+          >
+            <MdOutlineKeyboardDoubleArrowRight size={20} />
+          </li>
+        )}
 
+        {/* Last Page */}
+        {pageNumber < totalPage && (
+          <li
+            onClick={() => setPageNumber(totalPage)}
+            className="w-[40px] h-[40px] rounded-full flex justify-center items-center bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white cursor-pointer transition-all duration-300"
+          >
+            <MdLastPage size={20} />
+          </li>
+        )}
+      </ul>
 
+      {/* Page Info + Items per page */}
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <p className="text-gray-600 font-medium">
+          Page <span className="text-green-600">{pageNumber}</span> of{" "}
+          <span className="text-green-600">{totalPage}</span>
+        </p>
+
+        <div className="flex items-center gap-2">
+          <label className="text-gray-700 font-medium">Items per page:</label>
+          <select
+            value={parPage}
+            onChange={(e) => {
+              setParPage(parseInt(e.target.value));
+              setPageNumber(1); // Reset to first page
+            }}
+            className="px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Pagination;
