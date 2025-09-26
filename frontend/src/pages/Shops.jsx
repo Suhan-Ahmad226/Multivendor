@@ -1,43 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { Link } from 'react-router-dom';
-import { IoIosArrowForward } from "react-icons/io";
+import { Link, useNavigate } from 'react-router-dom';
 import { Range } from 'react-range';
 import { AiFillStar, AiOutlineHeart } from 'react-icons/ai';
 import { CiStar } from 'react-icons/ci';
 import { BsFillGridFill } from 'react-icons/bs';
 import { FaThList, FaEye, FaShoppingCart } from 'react-icons/fa';
-import Products from '../components/products/Products';
-import ShopProducts from '../components/products/ShopProducts';
-import Pagination from '../components/Pagination';
+import { IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from 'react-redux';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import Products from '../components/products/Products';
+import Pagination from '../components/Pagination';
+import ShopProducts from '../components/products/ShopProducts';
 import { price_range_product, query_products } from '../store/reducers/homeReducer';
+import { add_to_card, add_to_wishlist, messageClear } from '../../store/reducers/cardReducer';
+import toast from 'react-hot-toast';
 
 const Shops = () => {
     const dispatch = useDispatch();
-    const { products, categorys, priceRange, latest_product, totalProduct, parPage } = useSelector(state => state.home);
+    const navigate = useNavigate();
 
-    const [filter, setFilter] = useState(true);
-    const [state, setState] = useState({ values: [0, 0] });
-    const [rating, setRating] = useState('');
-    const [styles, setStyles] = useState('grid');
-    const [pageNumber, setPageNumber] = useState(1);
-    const [sortPrice, setSortPrice] = useState('');
-    const [category, setCategory] = useState('');
+    const { products, categorys, priceRange, latest_product, totalProduct, parPage } = useSelector(state => state.home);
+    const { userInfo } = useSelector(state => state.auth);
+    const { errorMessage, successMessage } = useSelector(state => state.card);
+
+    const [filter, setFilter] = useState(true);  
+    const [state, setState] = useState({ values: [0, 0] });  
+    const [rating, setRating] = useState('');  
+    const [styles, setStyles] = useState('grid');  
+    const [pageNumber, setPageNumber] = useState(1);  
+    const [sortPrice, setSortPrice] = useState('');  
+    const [category, setCategory] = useState('');  
 
     // Load price range
-    useEffect(() => { 
+    useEffect(() => {
         dispatch(price_range_product());
     }, [dispatch]);
 
-    useEffect(() => { 
+    useEffect(() => {
         setState({ values: [priceRange.low, priceRange.high] });
     }, [priceRange]);
-
-    const queryCategory = (e, value) => {
-        setCategory(e.target.checked ? value : '');
-    };
 
     useEffect(() => { 
         dispatch(query_products({
@@ -50,6 +52,17 @@ const Shops = () => {
         }));
     }, [state.values, category, rating, sortPrice, pageNumber, dispatch]);
 
+    useEffect(() => {
+        if(successMessage){
+            toast.success(successMessage);
+            dispatch(messageClear());
+        }
+        if(errorMessage){
+            toast.error(errorMessage);
+            dispatch(messageClear());
+        }
+    }, [successMessage, errorMessage, dispatch]);
+
     const resetRating = () => {
         setRating('');
         dispatch(query_products({
@@ -60,11 +73,40 @@ const Shops = () => {
             sortPrice,
             pageNumber
         }));
-    };
+    }
+
+    const queryCategory = (e, value) => {
+        setCategory(e.target.checked ? value : '');
+    }
+
+    const addToCart = (id) => {
+        if(userInfo){
+            dispatch(add_to_card({ userId: userInfo.id, quantity:1, productId:id }));
+        } else {
+            navigate('/login');
+        }
+    }
+
+    const addToWishlist = (product) => {
+        if(!userInfo){
+            navigate('/login');
+            return;
+        }
+        dispatch(add_to_wishlist({
+            userId: userInfo.id,
+            productId: product._id,
+            name: product.name,
+            price: product.price,
+            image: product.images[0],
+            discount: product.discount,
+            rating: product.rating,
+            slug: product.slug
+        }));
+    }
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Header />
+            <Header/>
 
             {/* Banner */}
             <section className='relative h-[220px] bg-cover bg-no-repeat bg-left mt-6' style={{ backgroundImage: 'url("/images/banner/shop.png")' }}>
@@ -73,7 +115,7 @@ const Shops = () => {
                         <h2 className='text-3xl md:text-4xl font-bold'>Shop Page</h2>
                         <div className='flex justify-center items-center gap-2 text-lg md:text-xl mt-2'>
                             <Link to="/" className='hover:text-indigo-400 transition-colors'>Home</Link>
-                            <IoIosArrowForward className='mt-1' />
+                            <IoIosArrowForward className='mt-1'/>
                             <span>Shop</span>
                         </div>
                     </div>
@@ -130,7 +172,7 @@ const Shops = () => {
                                 <div className='flex flex-col gap-2'>
                                     {[5,4,3,2,1].map((r) => (
                                         <div key={r} onClick={() => setRating(r)} className='flex items-center gap-1 cursor-pointer text-orange-500'>
-                                            {Array.from({length:5}, (_,i) => i < r ? <AiFillStar key={i}/> : <CiStar key={i}/> )}
+                                            {Array.from({length:5}, (_,i) => i<r ? <AiFillStar key={i}/> : <CiStar key={i}/>)}
                                         </div>
                                     ))}
                                     <div onClick={resetRating} className='flex items-center gap-1 cursor-pointer text-gray-400'>
@@ -141,7 +183,7 @@ const Shops = () => {
 
                             {/* Latest Products (mobile only) */}
                             <div className='md:hidden'>
-                                <Products title='Latest Products' products={latest_product} />
+                                <Products title='Latest Products' products={latest_product}/>
                             </div>
 
                         </div>
@@ -166,20 +208,32 @@ const Shops = () => {
                         </div>
 
                         <div className={styles==='grid' ? 'grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6' : 'flex flex-col gap-6'}>
-                            {products.map((p, i) => (
-                                <div key={i} className='bg-white rounded-md shadow-md overflow-hidden relative group'>
+                            {products.map((p,i) => (
+                                <div key={i} className='bg-white rounded-md shadow-md overflow-hidden relative group hover:shadow-xl transition-shadow duration-300'>
+                                    
+                                    {/* Discount/New */}
                                     {p.discount > 0 && <span className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded'>-{p.discount}%</span>}
                                     {p.isNew && <span className='absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded'>New</span>}
 
+                                    {/* Product Image & Icons */}
                                     <div className='relative'>
                                         <img src={p.images[0]} alt={p.name} className='w-full h-60 object-cover transition-transform group-hover:scale-105'/>
                                         <div className='absolute inset-0 flex justify-center items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity bg-black/20'>
-                                            <FaEye className='text-white text-lg cursor-pointer'/>
-                                            <FaShoppingCart className='text-white text-lg cursor-pointer'/>
-                                            <AiOutlineHeart className='text-white text-lg cursor-pointer'/>
+                                            
+                                            {/* FaEye Link */}
+                                            <Link to={`/product/details/${p.slug}`} className='text-white text-lg cursor-pointer hover:text-green-400'>
+                                                <FaEye />
+                                            </Link>
+
+                                            {/* Add to Cart */}
+                                            <FaShoppingCart onClick={()=>addToCart(p._id)} className='text-white text-lg cursor-pointer hover:text-green-400'/>
+
+                                            {/* Wishlist */}
+                                            <AiOutlineHeart onClick={()=>addToWishlist(p)} className='text-white text-lg cursor-pointer hover:text-green-400'/>
                                         </div>
                                     </div>
 
+                                    {/* Product Info */}
                                     <div className='p-4'>
                                         <h3 className='text-md font-semibold text-slate-700 mb-1'>{p.name}</h3>
                                         <p className='text-sm text-slate-500 mb-2'>Brand: {p.brand}</p>
@@ -194,12 +248,12 @@ const Shops = () => {
 
                         {totalProduct > parPage && (
                             <div className='mt-6'>
-                                <Pagination 
-                                    pageNumber={pageNumber} 
-                                    setPageNumber={setPageNumber} 
-                                    totalItem={totalProduct} 
-                                    parPage={parPage} 
-                                    showItem={Math.ceil(totalProduct/parPage)} 
+                                <Pagination
+                                    pageNumber={pageNumber}
+                                    setPageNumber={setPageNumber}
+                                    totalItem={totalProduct}
+                                    parPage={parPage}
+                                    showItem={Math.ceil(totalProduct/parPage)}
                                 />
                             </div>
                         )}
@@ -207,7 +261,7 @@ const Shops = () => {
                 </div>
             </section>
 
-            <Footer />
+            <Footer/>
         </div>
     );
 };
