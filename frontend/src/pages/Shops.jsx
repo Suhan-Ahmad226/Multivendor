@@ -1,45 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Range } from 'react-range';
-import { AiFillStar, AiOutlineHeart } from 'react-icons/ai';
-import { CiStar } from 'react-icons/ci';
-import { BsFillGridFill } from 'react-icons/bs';
-import { FaThList, FaEye, FaShoppingCart } from 'react-icons/fa';
-import { IoIosArrowForward } from "react-icons/io";
-import { useDispatch, useSelector } from 'react-redux';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Link } from 'react-router-dom';
+import { IoIosArrowForward } from "react-icons/io";
+import { Range } from 'react-range';
+import { AiFillStar } from 'react-icons/ai';
+import { CiStar } from 'react-icons/ci';
 import Products from '../components/products/Products';
-import Pagination from '../components/Pagination';
+import { BsFillGridFill } from 'react-icons/bs';
+import { FaThList } from 'react-icons/fa';
 import ShopProducts from '../components/products/ShopProducts';
+import Pagination from '../components/Pagination';
+import { useDispatch, useSelector } from 'react-redux';
 import { price_range_product, query_products } from '../store/reducers/homeReducer';
-import { add_to_card, add_to_wishlist, messageClear } from '../../store/reducers/cardReducer';
-import toast from 'react-hot-toast';
 
 const Shops = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-
     const { products, categorys, priceRange, latest_product, totalProduct, parPage } = useSelector(state => state.home);
-    const { userInfo } = useSelector(state => state.auth);
-    const { errorMessage, successMessage } = useSelector(state => state.card);
 
-    const [filter, setFilter] = useState(true);  
-    const [state, setState] = useState({ values: [0, 0] });  
-    const [rating, setRating] = useState('');  
-    const [styles, setStyles] = useState('grid');  
-    const [pageNumber, setPageNumber] = useState(1);  
-    const [sortPrice, setSortPrice] = useState('');  
-    const [category, setCategory] = useState('');  
+    const [filter, setFilter] = useState(true);
+    const [state, setState] = useState({ values: [priceRange.low, priceRange.high] });
+    const [rating, setRating] = useState('');
+    const [styles, setStyles] = useState('grid');
+    const [pageNumber, setPageNumber] = useState(1);
+    const [sortPrice, setSortPrice] = useState('');
+    const [category, setCategory] = useState('');
 
-    // Load price range
-    useEffect(() => {
+    useEffect(() => { 
         dispatch(price_range_product());
-    }, [dispatch]);
+    }, []);
 
-    useEffect(() => {
+    useEffect(() => { 
         setState({ values: [priceRange.low, priceRange.high] });
     }, [priceRange]);
+
+    const queryCategory = (e, value) => {
+        if (e.target.checked) setCategory(value);
+        else setCategory('');
+    };
 
     useEffect(() => { 
         dispatch(query_products({
@@ -50,18 +48,7 @@ const Shops = () => {
             sortPrice,
             pageNumber
         }));
-    }, [state.values, category, rating, sortPrice, pageNumber, dispatch]);
-
-    useEffect(() => {
-        if(successMessage){
-            toast.success(successMessage);
-            dispatch(messageClear());
-        }
-        if(errorMessage){
-            toast.error(errorMessage);
-            dispatch(messageClear());
-        }
-    }, [successMessage, errorMessage, dispatch]);
+    }, [state.values[0], state.values[1], category, rating, sortPrice, pageNumber]);
 
     const resetRating = () => {
         setRating('');
@@ -73,49 +60,20 @@ const Shops = () => {
             sortPrice,
             pageNumber
         }));
-    }
-
-    const queryCategory = (e, value) => {
-        setCategory(e.target.checked ? value : '');
-    }
-
-    const addToCart = (id) => {
-        if(userInfo){
-            dispatch(add_to_card({ userId: userInfo.id, quantity:1, productId:id }));
-        } else {
-            navigate('/login');
-        }
-    }
-
-    const addToWishlist = (product) => {
-        if(!userInfo){
-            navigate('/login');
-            return;
-        }
-        dispatch(add_to_wishlist({
-            userId: userInfo.id,
-            productId: product._id,
-            name: product.name,
-            price: product.price,
-            image: product.images[0],
-            discount: product.discount,
-            rating: product.rating,
-            slug: product.slug
-        }));
-    }
+    };
 
     return (
-        <div className="flex flex-col min-h-screen">
-            <Header/>
+        <div className='bg-gray-50'>
+            <Header />
 
-            {/* Banner */}
-            <section className='relative h-[220px] bg-cover bg-no-repeat bg-left mt-6' style={{ backgroundImage: 'url("/images/banner/shop.png")' }}>
-                <div className='absolute inset-0 bg-black/60 flex items-center justify-center'>
+            {/* Banner Section */}
+            <section className='relative h-[220px] mt-6 bg-cover bg-no-repeat bg-left' style={{ backgroundImage: 'url("/images/banner/shop.png")' }}>
+                <div className='absolute inset-0 bg-black/60 flex justify-center items-center'>
                     <div className='text-center text-white'>
-                        <h2 className='text-3xl md:text-4xl font-bold'>Shop Page</h2>
-                        <div className='flex justify-center items-center gap-2 text-lg md:text-xl mt-2'>
-                            <Link to="/" className='hover:text-indigo-400 transition-colors'>Home</Link>
-                            <IoIosArrowForward className='mt-1'/>
+                        <h2 className='text-3xl md:text-4xl font-bold mb-2'>Shop Page</h2>
+                        <div className='flex justify-center items-center gap-2 text-lg md:text-xl'>
+                            <Link to='/' className='hover:underline'>Home</Link>
+                            <IoIosArrowForward />
                             <span>Shop</span>
                         </div>
                     </div>
@@ -124,144 +82,128 @@ const Shops = () => {
 
             {/* Shop Content */}
             <section className='py-16'>
-                <div className='w-[90%] max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-8'>
-
+                <div className='w-[90%] md:w-[85%] mx-auto flex flex-col md:flex-row gap-8'>
+                    
                     {/* Sidebar Filter */}
-                    <div className={`lg:w-1/4 w-full transition-all duration-300 ${filter ? 'h-auto opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
-                        <div className='bg-white p-5 rounded-md shadow-md flex flex-col gap-6'>
+                    <aside className={`md:w-1/4 bg-white p-5 rounded-md shadow-lg transition-all duration-300 ${filter ? 'max-h-[1000px]' : 'max-h-0 overflow-hidden'}`}>
+                        <button onClick={() => setFilter(!filter)} className='md:hidden mb-5 w-full py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors'>
+                            {filter ? 'Hide Filters' : 'Show Filters'}
+                        </button>
 
-                            {/* Category Filter */}
-                            <div>
-                                <h2 className='text-xl font-bold text-slate-600 mb-3'>Category</h2>
-                                <div className='flex flex-col gap-2'>
-                                    {categorys.map((c, i) => (
-                                        <label key={i} className='flex items-center gap-2 cursor-pointer text-slate-700'>
-                                            <input type="checkbox" checked={category === c.name} onChange={(e) => queryCategory(e, c.name)} />
-                                            {c.name}
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Price Filter */}
-                            <div>
-                                <h2 className='text-xl font-bold text-slate-600 mb-3'>Price</h2>
-                                <Range
-                                    step={5}
-                                    min={priceRange.low}
-                                    max={priceRange.high}
-                                    values={state.values}
-                                    onChange={(values) => setState({ values })}
-                                    renderTrack={({ props, children }) => (
-                                        <div {...props} className='w-full h-2 bg-slate-200 rounded-full cursor-pointer'>
-                                            {children}
-                                        </div>
-                                    )}
-                                    renderThumb={({ props }) => (
-                                        <div {...props} className='w-5 h-5 bg-green-600 rounded-full shadow-lg' />
-                                    )}
-                                />
-                                <div className='mt-2 text-slate-700 font-semibold'>
-                                    ${Math.floor(state.values[0])} - ${Math.floor(state.values[1])}
-                                </div>
-                            </div>
-
-                            {/* Rating Filter */}
-                            <div>
-                                <h2 className='text-xl font-bold text-slate-600 mb-3'>Rating</h2>
-                                <div className='flex flex-col gap-2'>
-                                    {[5,4,3,2,1].map((r) => (
-                                        <div key={r} onClick={() => setRating(r)} className='flex items-center gap-1 cursor-pointer text-orange-500'>
-                                            {Array.from({length:5}, (_,i) => i<r ? <AiFillStar key={i}/> : <CiStar key={i}/>)}
-                                        </div>
-                                    ))}
-                                    <div onClick={resetRating} className='flex items-center gap-1 cursor-pointer text-gray-400'>
-                                        {Array.from({length:5}, (_,i) => <CiStar key={i}/> )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Latest Products (mobile only) */}
-                            <div className='md:hidden'>
-                                <Products title='Latest Products' products={latest_product}/>
-                            </div>
-
+                        {/* Category */}
+                        <div className='mb-6'>
+                            <h3 className='text-xl font-semibold text-slate-700 mb-3'>Category</h3>
+                            {categorys.map((c, i) => (
+                                <label key={i} className='flex items-center gap-2 mb-2 cursor-pointer'>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={category === c.name} 
+                                        onChange={(e) => queryCategory(e, c.name)} 
+                                        className='accent-indigo-500'
+                                    />
+                                    <span className='text-slate-700'>{c.name}</span>
+                                </label>
+                            ))}
                         </div>
-                    </div>
 
-                    {/* Main Products */}
-                    <div className='flex-1'>
-                        <div className='flex justify-between items-center mb-4 flex-wrap gap-4'>
-                            <h2 className='text-lg font-semibold text-slate-600'>({totalProduct}) Products</h2>
-                            <div className='flex items-center gap-4 flex-wrap'>
-                                <select onChange={(e)=>setSortPrice(e.target.value)} className='p-1 border outline-none text-slate-700 font-semibold'>
+                        {/* Price Range */}
+                        <div className='mb-6'>
+                            <h3 className='text-xl font-semibold text-slate-700 mb-3'>Price</h3>
+                            <Range
+                                step={5}
+                                min={priceRange.low}
+                                max={priceRange.high}
+                                values={state.values}
+                                onChange={(values) => setState({ values })}
+                                renderTrack={({ props, children }) => (
+                                    <div {...props} className='w-full h-2 bg-gray-300 rounded-lg'>
+                                        {children}
+                                    </div>
+                                )}
+                                renderThumb={({ props }) => (
+                                    <div {...props} className='w-5 h-5 bg-indigo-500 rounded-full shadow-md'></div>
+                                )}
+                            />
+                            <div className='mt-2 font-semibold text-slate-800'>
+                                ${Math.floor(state.values[0])} - ${Math.floor(state.values[1])}
+                            </div>
+                        </div>
+
+                        {/* Rating */}
+                        <div className='mb-6'>
+                            <h3 className='text-xl font-semibold text-slate-700 mb-3'>Rating</h3>
+                            <div className='flex flex-col gap-2'>
+                                {[5,4,3,2,1,0].map((r) => (
+                                    <div 
+                                        key={r} 
+                                        onClick={r===0 ? resetRating : () => setRating(r)}
+                                        className='flex items-center gap-1 cursor-pointer text-orange-500 hover:text-orange-600 transition-colors'
+                                    >
+                                        {Array.from({length: 5}).map((_, i) => (
+                                            i < r ? <AiFillStar key={i}/> : <CiStar key={i}/>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Latest Product (Mobile) */}
+                        <div className='md:hidden mt-6'>
+                            <Products title='Latest Product' products={latest_product} />
+                        </div>
+                    </aside>
+
+                    {/* Main Product Area */}
+                    <main className='md:w-3/4 flex flex-col gap-5'>
+                        {/* Sorting & View Toggle */}
+                        <div className='flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-md shadow-md'>
+                            <span className='text-slate-600 font-medium'>({totalProduct}) Products</span>
+                            <div className='flex items-center gap-3 mt-3 md:mt-0'>
+                                <select 
+                                    onChange={(e) => setSortPrice(e.target.value)} 
+                                    className='border p-2 rounded-md outline-none text-slate-600 font-semibold'
+                                >
                                     <option value="">Sort By</option>
                                     <option value="low-to-high">Low to High Price</option>
                                     <option value="high-to-low">High to Low Price</option>
                                 </select>
                                 <div className='flex gap-2'>
-                                    <div onClick={()=> setStyles('grid')} className={`p-2 cursor-pointer rounded ${styles==='grid' ? 'bg-slate-300' : 'hover:bg-slate-200'}`}><BsFillGridFill/></div>
-                                    <div onClick={()=> setStyles('list')} className={`p-2 cursor-pointer rounded ${styles==='list' ? 'bg-slate-300' : 'hover:bg-slate-200'}`}><FaThList/></div>
+                                    <div 
+                                        onClick={() => setStyles('grid')} 
+                                        className={`p-2 rounded-md cursor-pointer transition-colors ${styles === 'grid' ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
+                                    >
+                                        <BsFillGridFill />
+                                    </div>
+                                    <div 
+                                        onClick={() => setStyles('list')} 
+                                        className={`p-2 rounded-md cursor-pointer transition-colors ${styles === 'list' ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
+                                    >
+                                        <FaThList />
+                                    </div>
                                 </div>
-                                <button onClick={()=>setFilter(!filter)} className='lg:hidden bg-indigo-500 text-white px-3 py-1 rounded'>Filter</button>
                             </div>
                         </div>
 
-                        <div className={styles==='grid' ? 'grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6' : 'flex flex-col gap-6'}>
-                            {products.map((p,i) => (
-                                <div key={i} className='bg-white rounded-md shadow-md overflow-hidden relative group hover:shadow-xl transition-shadow duration-300'>
-                                    
-                                    {/* Discount/New */}
-                                    {p.discount > 0 && <span className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded'>-{p.discount}%</span>}
-                                    {p.isNew && <span className='absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded'>New</span>}
-
-                                    {/* Product Image & Icons */}
-                                    <div className='relative'>
-                                        <img src={p.images[0]} alt={p.name} className='w-full h-60 object-cover transition-transform group-hover:scale-105'/>
-                                        <div className='absolute inset-0 flex justify-center items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity bg-black/20'>
-                                            
-                                            {/* FaEye Link */}
-                                            <Link to={`/product/details/${p.slug}`} className='text-white text-lg cursor-pointer hover:text-green-400'>
-                                                <FaEye />
-                                            </Link>
-
-                                            {/* Add to Cart */}
-                                            <FaShoppingCart onClick={()=>addToCart(p._id)} className='text-white text-lg cursor-pointer hover:text-green-400'/>
-
-                                            {/* Wishlist */}
-                                            <AiOutlineHeart onClick={()=>addToWishlist(p)} className='text-white text-lg cursor-pointer hover:text-green-400'/>
-                                        </div>
-                                    </div>
-
-                                    {/* Product Info */}
-                                    <div className='p-4'>
-                                        <h3 className='text-md font-semibold text-slate-700 mb-1'>{p.name}</h3>
-                                        <p className='text-sm text-slate-500 mb-2'>Brand: {p.brand}</p>
-                                        <div className='flex items-center gap-2'>
-                                            <span className='text-lg font-bold text-orange-500'>${p.price - Math.floor((p.price*p.discount)/100)}</span>
-                                            {p.discount>0 && <span className='line-through text-sm text-gray-400'>${p.price}</span>}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                        {/* Products */}
+                        <div>
+                            <ShopProducts products={products} styles={styles} />
                         </div>
 
+                        {/* Pagination */}
                         {totalProduct > parPage && (
-                            <div className='mt-6'>
-                                <Pagination
-                                    pageNumber={pageNumber}
-                                    setPageNumber={setPageNumber}
-                                    totalItem={totalProduct}
-                                    parPage={parPage}
-                                    showItem={Math.ceil(totalProduct/parPage)}
-                                />
-                            </div>
+                            <Pagination 
+                                pageNumber={pageNumber} 
+                                setPageNumber={setPageNumber} 
+                                totalItem={totalProduct} 
+                                parPage={parPage} 
+                                showItem={Math.floor(totalProduct / parPage)}
+                            />
                         )}
-                    </div>
+                    </main>
                 </div>
             </section>
 
-            <Footer/>
+            <Footer />
         </div>
     );
 };
