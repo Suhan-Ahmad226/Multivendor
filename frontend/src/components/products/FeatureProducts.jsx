@@ -1,27 +1,33 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import { FaEye, FaRegHeart } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
-import Rating from '../Rating';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { add_to_card, add_to_wishlist, messageClear } from '../../store/reducers/cardReducer';
-import toast from 'react-hot-toast';
+import Rating from "../Rating";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  add_to_card,
+  add_to_wishlist,
+  messageClear,
+} from "../../store/reducers/cardReducer";
+import toast from "react-hot-toast";
 
-const FeatureProducts = ({ products }) => {
+const FeatureProducts = ({ products = [] }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { userInfo } = useSelector(state => state.auth);
-  const { errorMessage, successMessage } = useSelector(state => state.card);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { errorMessage, successMessage } = useSelector((state) => state.card);
 
   const add_card = (id) => {
     if (userInfo) {
-      dispatch(add_to_card({
-        userId: userInfo.id,
-        quantity: 1,
-        productId: id
-      }));
+      dispatch(
+        add_to_card({
+          userId: userInfo.id,
+          quantity: 1,
+          productId: id,
+        })
+      );
     } else {
-      navigate('/login');
+      navigate("/login");
     }
   };
 
@@ -34,24 +40,34 @@ const FeatureProducts = ({ products }) => {
       toast.error(errorMessage);
       dispatch(messageClear());
     }
-  }, [successMessage, errorMessage]);
+  }, [successMessage, errorMessage, dispatch]);
 
   const add_wishlist = (pro) => {
     if (userInfo) {
-      dispatch(add_to_wishlist({
-        userId: userInfo.id,
-        productId: pro._id,
-        name: pro.name,
-        price: pro.price,
-        image: pro.images[0],
-        discount: pro.discount,
-        rating: pro.rating,
-        slug: pro.slug
-      }));
+      dispatch(
+        add_to_wishlist({
+          userId: userInfo.id,
+          productId: pro._id,
+          name: pro.name,
+          price: pro.price,
+          image: pro.image || pro.images?.[0], // ✅ নিরাপদ fallback
+          discount: pro.discount,
+          rating: pro.rating,
+          slug: pro.slug,
+        })
+      );
     } else {
-      navigate('/login');
+      navigate("/login");
     }
   };
+
+  if (!products.length) {
+    return (
+      <div className="w-full text-center py-10 text-slate-500">
+        No products found
+      </div>
+    );
+  }
 
   return (
     <div className="w-[90%] lg:w-[85%] mx-auto py-10">
@@ -79,9 +95,9 @@ const FeatureProducts = ({ products }) => {
               ) : null}
 
               <img
-                src={p.images[0]}
+                src={p.image || p.images?.[0]} // ✅ fallback
                 alt={p.name}
-                className="w-full h-[240px] object-cover transform group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-[240px] object-contain transform group-hover:scale-105 transition-transform duration-500"
               />
 
               {/* Hover Action Buttons */}
