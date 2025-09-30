@@ -2,7 +2,7 @@ import React from 'react';
 import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
 import { CiStar } from 'react-icons/ci';
 
-const Rating = ({ ratings, className = "" }) => {
+const Rating = ({ ratings = 0, className = "" }) => {
   // একটি অ্যারে তৈরি করা হয়েছে 5 স্টার পর্যন্ত
   const stars = [1, 2, 3, 4, 5];
 
@@ -21,13 +21,17 @@ const Rating = ({ ratings, className = "" }) => {
         return (
           <span
             key={index}
-            className={`text-[#EDBB0E] transition-transform duration-300 hover:scale-125`}
+            className="text-[#EDBB0E] transition-transform duration-300 hover:scale-125"
           >
             <StarIcon size={20} />
           </span>
         );
       })}
-      <span className="text-slate-600 ml-2 font-medium">{ratings.toFixed(1)}</span>
+
+      {/* fallback সহ safe করা হলো */}
+      <span className="text-slate-600 ml-2 font-medium">
+        {(ratings ?? 0).toFixed(1)}
+      </span>
     </div>
   );
 };
