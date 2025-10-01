@@ -162,7 +162,7 @@ const Dashboard = () => {
         {/* Main content */}
         <main
           className={`flex-1 transition-all duration-300 p-5
-            ${sidebarCollapsed && !hovered ? 'md:ml-20' : 'md:ml-64'}
+            ${sidebarCollapsed && !hovered ? 'md:ml-20'}
           `}
         >
           <Outlet />
