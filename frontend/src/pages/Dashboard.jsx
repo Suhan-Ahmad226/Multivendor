@@ -18,9 +18,9 @@ import { user_reset } from '../store/reducers/authReducer';
 import { reset_count } from '../store/reducers/cardReducer';
 
 const Dashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile open
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Desktop collapse
-  const [hovered, setHovered] = useState(false); // Hover expand
+  const [sidebarOpen, setSidebarOpen] = useState(false); 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -46,17 +46,15 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-100 overflow-hidden">
       <Header />
 
       <div className="flex flex-1">
-        {/* Sidebar */}
+        {/* Sidebar (desktop + mobile) */}
         <aside
-          className={`fixed top-0 left-0 h-full bg-white shadow-xl z-50 transform transition-all duration-300
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            md:translate-x-0 md:static
+          className={`bg-white shadow-xl transition-all duration-300 h-[calc(100vh-64px)] 
             ${sidebarCollapsed && !hovered ? 'w-20' : 'w-64'}
-          `}
+            hidden md:flex flex-col sticky top-[64px]`}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
@@ -75,23 +73,15 @@ const Dashboard = () => {
               )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-2">
-              <button
-                className="hidden md:flex text-gray-600 hover:text-green-600 transition"
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              >
-                {sidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
-              </button>
-              <button
-                className="md:hidden text-2xl font-bold text-gray-600 hover:text-red-500 transition"
-                onClick={() => setSidebarOpen(false)}
-              >
-                ×
-              </button>
-            </div>
+            <button
+              className="hidden md:flex text-gray-600 hover:text-green-600 transition"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            >
+              {sidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
+            </button>
           </div>
 
-          <ul className="mt-4 text-gray-700">
+          <ul className="mt-4 text-gray-700 flex-1">
             {sidebarLinks.map((link, idx) => (
               <li key={idx} className="hover:bg-green-50 transition rounded-md">
                 {link.path ? (
@@ -99,21 +89,9 @@ const Dashboard = () => {
                     to={link.path}
                     className={`flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium transition
                       ${sidebarCollapsed && !hovered ? 'justify-center' : ''}`}
-                    onClick={() => setSidebarOpen(false)}
                   >
                     <span className="text-xl">{link.icon}</span>
-                    <AnimatePresence>
-                      {(!sidebarCollapsed || hovered) && (
-                        <motion.span
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {link.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
+                    {(!sidebarCollapsed || hovered) && <span>{link.label}</span>}
                   </Link>
                 ) : (
                   <button
@@ -122,18 +100,48 @@ const Dashboard = () => {
                       ${sidebarCollapsed && !hovered ? 'justify-center' : ''}`}
                   >
                     <span className="text-xl">{link.icon}</span>
-                    <AnimatePresence>
-                      {(!sidebarCollapsed || hovered) && (
-                        <motion.span
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {link.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
+                    {(!sidebarCollapsed || hovered) && <span>{link.label}</span>}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        {/* Mobile Sidebar */}
+        <aside
+          className={`fixed top-0 left-0 h-full bg-white shadow-xl z-50 transform transition-transform duration-300 w-64
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden`}
+        >
+          <div className="flex justify-between items-center p-5 border-b">
+            <h2 className="text-lg font-bold text-gray-700">Menu</h2>
+            <button
+              className="text-2xl font-bold text-gray-600 hover:text-red-500 transition"
+              onClick={() => setSidebarOpen(false)}
+            >
+              ×
+            </button>
+          </div>
+
+          <ul className="mt-4 text-gray-700">
+            {sidebarLinks.map((link, idx) => (
+              <li key={idx} className="hover:bg-green-50 transition rounded-md">
+                {link.path ? (
+                  <Link
+                    to={link.path}
+                    className="flex items-center gap-3 px-4 py-3 hover:text-green-600 font-medium transition"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <span className="text-xl">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => { link.action(); setSidebarOpen(false); }}
+                    className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 font-medium hover:text-red-600 transition"
+                  >
+                    <span className="text-xl">{link.icon}</span>
+                    <span>{link.label}</span>
                   </button>
                 )}
               </li>
@@ -160,11 +168,7 @@ const Dashboard = () => {
         )}
 
         {/* Main content */}
-        <main
-          className={`flex-1 transition-all duration-300 p-5
-            ${sidebarCollapsed && !hovered ? 'md:ml-20'}
-          `}
-        >
+        <main className="flex-1 p-5">
           <Outlet />
         </main>
       </div>
