@@ -4,12 +4,12 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { FaList } from 'react-icons/fa';
 import { IoIosHome } from "react-icons/io";
-import { FaBorderAll } from "react-icons/fa6";
-import { FaHeart } from "react-icons/fa";
+import { FaBorderAll, FaHeart } from "react-icons/fa6";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -45,12 +45,6 @@ const Dashboard = () => {
     { icon: <IoMdLogOut />, label: 'Logout', action: logout },
   ];
 
-  // Determine sidebar width
-  const getSidebarWidth = () => {
-    if (sidebarCollapsed && !hovered) return '20'; // mini mode
-    if (!sidebarCollapsed || hovered) return '64'; // expanded
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 overflow-x-hidden">
       <Header />
@@ -60,15 +54,27 @@ const Dashboard = () => {
         <aside
           className={`fixed top-0 left-0 h-full bg-white shadow-xl z-50 transform transition-all duration-300
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            w-${getSidebarWidth()} md:translate-x-0 md:static
+            md:translate-x-0 md:static
+            ${sidebarCollapsed && !hovered ? 'w-20' : 'w-64'}
           `}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
           <div className="flex justify-between items-center p-5 border-b">
-            {!sidebarCollapsed || hovered ? (
-              <h2 className="text-lg font-bold text-gray-700">Menu</h2>
-            ) : null}
+            <AnimatePresence>
+              {(!sidebarCollapsed || hovered) && (
+                <motion.h2
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-lg font-bold text-gray-700"
+                >
+                  Menu
+                </motion.h2>
+              )}
+            </AnimatePresence>
+
             <div className="flex items-center gap-2">
               <button
                 className="hidden md:flex text-gray-600 hover:text-green-600 transition"
@@ -96,7 +102,18 @@ const Dashboard = () => {
                     onClick={() => setSidebarOpen(false)}
                   >
                     <span className="text-xl">{link.icon}</span>
-                    {(!sidebarCollapsed || hovered) && link.label}
+                    <AnimatePresence>
+                      {(!sidebarCollapsed || hovered) && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {link.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </Link>
                 ) : (
                   <button
@@ -105,7 +122,18 @@ const Dashboard = () => {
                       ${sidebarCollapsed && !hovered ? 'justify-center' : ''}`}
                   >
                     <span className="text-xl">{link.icon}</span>
-                    {(!sidebarCollapsed || hovered) && link.label}
+                    <AnimatePresence>
+                      {(!sidebarCollapsed || hovered) && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {link.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </button>
                 )}
               </li>
@@ -133,8 +161,8 @@ const Dashboard = () => {
 
         {/* Main content */}
         <main
-          className={`flex-1 transition-all duration-300 p-5
-            md:ml-${getSidebarWidth()} w-full
+          className={`flex-1 transition-all duration-300 p-5 w-full
+            ${sidebarCollapsed && !hovered ? 'md:ml-20' : 'md:ml-64'}
           `}
         >
           <Outlet />
