@@ -1,2 +1,0 @@
-# Multivendor
-E-commerce Website
